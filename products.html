@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zwiitavhathu Cartridges – Products</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: white;
+    }
+
+    header {
+      background: #111;
+      padding: 18px;
+      text-align: center;
+      border-bottom: 1px solid #00ffc6;
+    }
+
+    header a {
+      color: #00ffc6;
+      margin: 0 20px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+      font-size: 1.1em;
+    }
+
+    header a:hover {
+      color: #00cc99;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 30px;
+      color: #00ffc6;
+      font-size: 2.4em;
+      text-shadow: 0 0 15px rgba(0,255,198,0.8);
+    }
+
+    /* Search Bar */
+    .search-bar {
+      text-align: center;
+      margin: 20px auto;
+    }
+
+    .search-bar input {
+      width: 60%;
+      padding: 12px 20px;
+      border-radius: 25px;
+      border: none;
+      font-size: 1em;
+      background: #333;
+      color: white;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .search-bar input:focus {
+      background: #444;
+      box-shadow: 0 0 10px #00ffc6;
+    }
+
+    /* Request Button */
+    .request-btn {
+      display: block;
+      margin: 15px auto;
+      background: #00ffc6;
+      color: black;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .request-btn:hover {
+      background: #00cc99;
+      transform: scale(1.05);
+    }
+
+    /* Product Grid */
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 25px;
+      padding: 40px;
+    }
+
+    .card {
+      background: #222;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      transition: 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      background: #2a2a2a;
+    }
+
+    .card img {
+      width: 130px;
+      height: auto;
+      margin-bottom: 15px;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .card h3 {
+      margin: 5px 0;
+      font-size: 1.1em;
+      color: #00ffc6;
+    }
+
+    .card small {
+      color: #bbb;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .price.normal { color: #00ffc6; }
+    .price.request { color: #ffcc00; }
+
+    .order-btn {
+      background: #00ffc6;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: 0.3s ease;
+    }
+
+    .order-btn:hover {
+      background: #00cc99;
+      transform: scale(1.05);
+    }
+
+    /* Modal */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .modal {
+      background: #111;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      color: white;
+      box-shadow: 0 0 20px rgba(0,255,198,0.4);
+    }
+
+    .modal input,
+    .modal select,
+    .modal textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      background: #222;
+      border: none;
+      border-radius: 8px;
+      color: white;
+    }
+
+    .modal button {
+      width: 100%;
+      padding: 12px;
+      background: #00ffc6;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      color: black;
+    }
+
+    .modal button:hover {
+      background: #00cc99;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a href="/">🏠 Home</a>
+  <a href="/products">🖨️ Products</a>
+</header>
+
+<h1>Our Printer Cartridges</h1>
+
+<div class="search-bar">
+  <input id="searchInput" placeholder="🔍 Search by name or code…">
+</div>
+
+<button class="request-btn" onclick="openGeneralRequest()">
+  💬 Can't Find Your Cartridge? Request It Here
+</button>
+
+<div id="product-container" class="container"></div>
+
+<!-- Modal -->
+<div id="modal-bg" class="modal-bg">
+  <div class="modal">
+    <h2 id="modalTitle">Request</h2>
+    <input id="customerName" placeholder="Your Name">
+    <input id="customerEmail" placeholder="Your Email">
+    <select id="printerType">
+      <option value="">Select Printer Brand</option>
+      <option>HP</option>
+      <option>Canon</option>
+      <option>Epson</option>
+      <option>Brother</option>
+      <option>Other</option>
+    </select>
+
+    <div id="quantitySection">
+      <input type="number" id="quantity" min="1" value="1">
+    </div>
+
+    <div id="notesSection">
+      <textarea id="notes" rows="3" placeholder="Describe the cartridge you need (name or code)…"></textarea>
+    </div>
+
+    <button id="submitOrder">Submit</button>
+  </div>
+</div>
+
+<script>
+let selectedProduct = null;
+
+/* ========== LOAD PRODUCTS ========== */
+async function loadProducts(query = "") {
+  const res = await fetch(`/api/cartridges?q=${encodeURIComponent(query)}`);
+  const products = await res.json();
+
+  const container = document.getElementById("product-container");
+  container.innerHTML = "";
+
+  products.forEach(p => {
+    // Option A filter
+    if (!p.name && !p.code) return;
+    if (p.name && p.name.length < 2 && !p.code) return;
+
+    const name = p.name || "Unnamed Cartridge";
+    const image = p.image ? p.image : "default.jpg";
+
+    const isQueryOnly = !p.price;
+    const priceText = isQueryOnly ? "Price on Request" : `R${p.price}`;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="images/${image}" onerror="this.src='images/default.jpg'">
+      <h3>${name}</h3>
+      ${p.code ? `<small>Code: ${p.code}</small>` : ""}
+      <div class="price ${isQueryOnly ? "request" : "normal"}">${priceText}</div>
+      <button class="order-btn" onclick="openModal(${p.id}, ${isQueryOnly})">
+        ${isQueryOnly ? "💬 Query Price" : "🛒 Order Now"}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+
+  if (container.innerHTML.trim() === "") {
+    container.innerHTML = "<p>No products found.</p>";
+  }
+}
+
+/* ========== OPEN PRODUCT MODAL ========== */
+function openModal(id, isQueryOnly) {
+  selectedProduct = { id, isQueryOnly };
+  document.getElementById("modal-bg").style.display = "flex";
+
+  document.getElementById("modalTitle").innerText =
+    isQueryOnly ? "Query Price" : "Place Your Order";
+
+  document.getElementById("quantitySection").style.display =
+    isQueryOnly ? "none" : "block";
+
+  document.getElementById("notesSection").style.display =
+    isQueryOnly ? "block" : "none";
+}
+
+/* ========== GENERAL REQUEST MODAL ========== */
+function openGeneralRequest() {
+  selectedProduct = { id: null, isQueryOnly: true };
+  document.getElementById("modal-bg").style.display = "flex";
+  document.getElementById("modalTitle").innerText = "Request a Cartridge";
+  document.getElementById("quantitySection").style.display = "none";
+  document.getElementById("notesSection").style.display = "block";
+}
+
+/* ========== CLOSE MODAL ========== */
+document.getElementById("modal-bg").addEventListener("click", e => {
+  if (e.target.id === "modal-bg") {
+    document.getElementById("modal-bg").style.display = "none";
+  }
+});
+
+/* ========== SUBMIT FORM ========== */
+document.getElementById("submitOrder").addEventListener("click", async () => {
+  const name = customerName.value.trim();
+  const email = customerEmail.value.trim();
+  const printerType = printerType.value;
+  const quantity = parseInt(quantity.value);
+  const notes = notes.value.trim();
+
+  if (!name || !email) return alert("Please fill in required fields.");
+
+  let body, url;
+
+  if (selectedProduct.id) {
+    url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
+    body = selectedProduct.isQueryOnly
+      ? { name, email, printerType, productId: selectedProduct.id, notes }
+      : { name, email, printerType, productId: selectedProduct.id, quantity };
+  } else {
+    // General request (no product ID)
+    url = "/api/query";
+    body = { name, email, printerType, productId: 0, notes };
+  }
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  const result = await res.json();
+  if (result.success) {
+    alert("Request sent!");
+    document.getElementById("modal-bg").style.display = "none";
+  } else {
+    alert("Error: " + result.error);
+  }
+});
+
+/* Search */
+document.getElementById("searchInput").addEventListener("input", e => {
+  loadProducts(e.target.value);
+});
+
+/* Initial Load */
+loadProducts();
+</script>
+</body>
+</html>
