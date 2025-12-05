@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 
@@ -13,3 +14,20 @@ db.exec(sql, (err) => {
   }
   db.close();
 });
+=======
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
+
+const db = new sqlite3.Database('./database.db');
+
+const sql = fs.readFileSync('import_cartridges.sql', 'utf8');
+
+db.exec(sql, (err) => {
+  if (err) {
+    console.error("❌ Import failed:", err.message);
+  } else {
+    console.log("✅ Cartridges imported successfully from SQL file!");
+  }
+  db.close();
+});
+>>>>>>> 073f25624de62b5ba46a1884c66c76c40184f50d
