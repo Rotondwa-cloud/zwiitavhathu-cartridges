@@ -1,17 +1,10 @@
 {
   "name": "printer-shop",
   "version": "1.0.0",
-<<<<<<< HEAD
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-=======
-  "description": "Ink cartridge ordering website",
+  "description": "Zwiitavhathu Cartridges Web App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
->>>>>>> 073f25624de62b5ba46a1884c66c76c40184f50d
   },
   "keywords": [],
   "author": "",
@@ -23,11 +16,5 @@
     "mammoth": "^1.11.0",
     "nodemailer": "^7.0.10",
     "sqlite3": "^5.1.7"
-<<<<<<< HEAD
-=======
-  },
-  "engines": {
-    "node": ">=18"
->>>>>>> 073f25624de62b5ba46a1884c66c76c40184f50d
   }
 }
