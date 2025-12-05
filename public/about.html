@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - Zwiitavhathu Cartridges</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      height: 100%;
+      background: #000;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 230px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar-logo {
+      font-size: 1.5em;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #00c3ff;
+      text-shadow: 0 0 10px #00c3ff;
+    }
+
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar nav ul li {
+      margin: 15px 0;
+    }
+
+    .sidebar nav ul li a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .sidebar nav ul li a:hover,
+    .sidebar nav ul li a.active {
+      color: #00c3ff;
+      transform: translateX(5px);
+    }
+
+    /* Main Content */
+    .content {
+      flex: 1;
+      position: relative;
+      background: url('hp.jpg') center/cover no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    .about-card {
+      position: relative;
+      z-index: 2;
+      max-width: 750px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0, 195, 255, 0.3);
+    }
+
+    .about-card h2 {
+      color: #fff;
+      font-size: 2.4em;
+      margin-bottom: 20px;
+    }
+
+    .about-card .highlight {
+      color: #00c3ff;
+      text-shadow: 0 0 15px #00c3ff;
+    }
+
+    .about-card p {
+      color: #eee;
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .about-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 30px 0;
+    }
+
+    .about-card ul li {
+      background: rgba(255, 255, 255, 0.08);
+      margin: 10px 0;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 1em;
+      color: #e0f7ff;
+      text-align: left;
+      transition: 0.3s;
+    }
+
+    .about-card ul li:hover {
+      background: rgba(0, 195, 255, 0.15);
+      transform: translateX(6px);
+    }
+
+    footer {
+      position: absolute;
+      bottom: 15px;
+      width: 100%;
+      text-align: center;
+      color: #aaa;
+      font-size: 0.9em;
+      z-index: 2;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <h2 class="sidebar-logo">🖨️ Zwiitavhathu</h2>
+        <nav>
+          <ul>
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="products.html">🛒 Products</a></li>
+            <li><a href="about.html" class="active">ℹ️ About Us</a></li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- About Content -->
+    <main class="content">
+      <div class="about-card">
+        <h2>About <span class="highlight">Zwiitavhathu Cartridges</span></h2>
+        <p>
+          At <span class="highlight">Zwiitavhathu Cartridges</span>, we are driven by a passion for 
+          <strong>quality, sustainability, and innovation</strong>.  
+          Our goal is to ensure our customers get reliable products at competitive prices — all while maintaining excellence in service delivery.
+        </p>
+        <p>
+          We believe that success lies in building <strong>trust-based partnerships</strong> and continuously improving to meet your printing needs.
+        </p>
+        <ul>
+          <li>🤝 Building strong, long-term relationships with clients and suppliers.</li>
+          <li>💡 Providing expert knowledge and personalized solutions for every need.</li>
+          <li>⏱️ Ensuring fast, efficient, and reliable delivery across all services.</li>
+        </ul>
+        <p>
+          Together, we print a <span class="highlight">brighter future</span> — one cartridge at a time.
+        </p>
+      </div>
+
+      <footer>
+        <p>© 2025 Zwiitavhathu Cartridges | Designed by Rotondwa</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
