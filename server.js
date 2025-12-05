@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
@@ -486,4 +486,4 @@ app.get('/admin/orders', (req, res) =>
 // START SERVER
 // ===================================
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
->>>>>>> 073f25624de62b5ba46a1884c66c76c40184f50d
+

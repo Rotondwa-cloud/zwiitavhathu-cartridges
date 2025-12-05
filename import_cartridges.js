@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
@@ -70,4 +70,4 @@ async function importCartridges() {
 }
 
 importCartridges().catch(err => console.error("❌ Error importing:", err));
->>>>>>> 073f25624de62b5ba46a1884c66c76c40184f50d
+

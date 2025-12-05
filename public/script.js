@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // ===============================
 // InkZone Shop Script
 // ===============================
@@ -210,4 +210,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
   }
 });
->>>>>>> 073f25624de62b5ba46a1884c66c76c40184f50d
+
