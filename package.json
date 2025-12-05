@@ -1,10 +1,10 @@
 {
   "name": "printer-shop",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Ink cartridge ordering website",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +16,8 @@
     "mammoth": "^1.11.0",
     "nodemailer": "^7.0.10",
     "sqlite3": "^5.1.7"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
