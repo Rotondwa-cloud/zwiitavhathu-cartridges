@@ -198,7 +198,6 @@
     .modal button:hover {
       background: #00cc99;
     }
-
   </style>
 </head>
 
@@ -261,21 +260,22 @@ async function loadProducts(query = "") {
   const container = document.getElementById("product-container");
   container.innerHTML = "";
 
-  products.forEach(p => {
-    if (!p.name && !p.code) return;
+  // Only allow items with PRICE or QUERY
+  const filtered = products.filter(p => p.price || p.is_query_only);
 
+  filtered.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
 
     const image = p.image || "default.jpg";
-    const price = p.price ? `R${p.price}` : "Price on Request";
+    const priceText = p.price ? `R${p.price}` : "Price on Request";
     const isQuery = !p.price;
 
     card.innerHTML = `
       <img src="images/${image}" onerror="this.src='images/default.jpg'">
-      <h3>${p.name || "Unnamed"}</h3>
+      <h3>${p.name}</h3>
       ${p.code ? `<small>Code: ${p.code}</small>` : ""}
-      <div class="price ${isQuery ? 'request' : 'normal'}">${price}</div>
+      <div class="price ${isQuery ? 'request' : 'normal'}">${priceText}</div>
       <button class="order-btn" onclick="openModal(${p.id}, ${isQuery})">
         ${isQuery ? "💬 Query Price" : "🛒 Order Now"}
       </button>
@@ -285,17 +285,15 @@ async function loadProducts(query = "") {
   });
 
   if (!container.innerHTML.trim()) {
-    container.innerHTML = "<p>No products found.</p>";
+    container.innerHTML = "<p>No matching cartridges found.</p>";
   }
 }
 
 /* Open Modal */
 function openModal(id, isQueryOnly) {
   selectedProduct = { id, isQueryOnly };
-
   document.getElementById("modal-bg").style.display = "flex";
-
-  document.getElementById("modalTitle").innerText = 
+  document.getElementById("modalTitle").innerText =
     isQueryOnly ? "Query Price" : "Place Your Order";
 
   document.getElementById("quantitySection").style.display =
@@ -323,7 +321,7 @@ document.getElementById("modal-bg").addEventListener("click", e => {
   }
 });
 
-/* Submit Request */
+/* Submit Request/Order */
 document.getElementById("submitOrder").addEventListener("click", async () => {
   const name = customerName.value.trim();
   const email = customerEmail.value.trim();
@@ -331,16 +329,15 @@ document.getElementById("submitOrder").addEventListener("click", async () => {
   const qty = quantity.value;
   const noteText = notes.value.trim();
 
-  if (!name || !email) return alert("Please fill in required fields.");
+  if (!name || !email) return alert("Please complete required fields.");
 
   let url, body;
 
   if (selectedProduct.id) {
     url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
-    body = selectedProduct.isQueryOnly ?
-      { name, email, printerType: type, productId: selectedProduct.id, notes: noteText }
-      :
-      { name, email, printerType: type, productId: selectedProduct.id, quantity: qty };
+    body = selectedProduct.isQueryOnly
+      ? { name, email, printerType: type, productId: selectedProduct.id, notes: noteText }
+      : { name, email, printerType: type, productId: selectedProduct.id, quantity: qty };
   } else {
     url = "/api/query";
     body = { name, email, printerType: type, productId: 0, notes: noteText };
@@ -354,7 +351,7 @@ document.getElementById("submitOrder").addEventListener("click", async () => {
 
   const result = await res.json();
   if (result.success) {
-    alert("Request sent!");
+    alert("Your request was sent successfully!");
     document.getElementById("modal-bg").style.display = "none";
   } else {
     alert("Error: " + result.error);
