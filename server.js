@@ -84,7 +84,7 @@ oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
-async function sendMail({ subject, html }) {
+async function sendMail({ subject, html, to }) {
   try {
     console.log("📤 Sending email via Gmail API (HTTP)");
 
@@ -92,7 +92,7 @@ async function sendMail({ subject, html }) {
 
     const messageParts = [
       `From: "Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
-      `To: ${process.env.GOOGLE_EMAIL}`,
+      `To: ${to || process.env.GOOGLE_EMAIL}`,
       `Subject: ${subject}`,
       'MIME-Version: 1.0',
       'Content-Type: text/html; charset=utf-8',
@@ -211,9 +211,9 @@ app.get('/api/cartridges', (req, res) => {
 });
 
 /* ===============================
-   PLACE ORDER
+   PLACE ORDER (WITH EMAIL)
 ================================ */
-app.post('/api/order', (req, res) => {
+app.post('/api/order', async (req, res) => {
   try {
     const { name, email, printerType, productId, quantity } = req.body;
 
@@ -232,6 +232,40 @@ app.post('/api/order', (req, res) => {
       (customer_name, customer_email, printer_type, product_id, quantity, total)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(name, email, printerType, productId, quantity, total);
+
+    // === SEND CUSTOMER CONFIRMATION EMAIL ===
+    try {
+      await sendMail({
+        subject: `Order Confirmation – ${product.name}`,
+        to: email, // sends to customer
+        html: `
+          <h2>Order Confirmation</h2>
+          <p>Thank you, ${name}, for your order!</p>
+          <p><strong>Product:</strong> ${product.name}</p>
+          <p><strong>Quantity:</strong> ${quantity}</p>
+          <p><strong>Total:</strong> R${total.toFixed(2)}</p>
+          <p>We will process your order shortly.</p>
+        `
+      });
+
+      // Also send a copy to admin
+      await sendMail({
+        subject: `New Order – ${product.name}`,
+        html: `
+          <h2>New Order Received</h2>
+          <p><strong>Customer Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Printer:</strong> ${printerType}</p>
+          <p><strong>Product:</strong> ${product.name}</p>
+          <p><strong>Quantity:</strong> ${quantity}</p>
+          <p><strong>Total:</strong> R${total.toFixed(2)}</p>
+        `
+      });
+
+      console.log("✅ Order confirmation emails sent");
+    } catch(emailErr) {
+      console.error("❌ Order email failed:", emailErr.message || emailErr);
+    }
 
     res.json({ success: true, orderId: result.lastInsertRowid });
 
@@ -289,6 +323,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
