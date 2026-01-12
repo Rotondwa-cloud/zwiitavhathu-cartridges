@@ -5,199 +5,261 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zwiitavhathu Cartridges – Products</title>
 
-  <link rel="stylesheet" href="style.css">
-
   <style>
-    /* ====== PRODUCTS PAGE ====== */
-    .products-hero {
-      position: relative;
-      height: 40vh;
-      background: url('images/backk.jpg') center/cover no-repeat;
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      height: 100%;
+      background: #0a0a0f;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .container {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* ============================
+       SIDEBAR
+    ============================ */
+    .sidebar {
+      width: 230px;
+      background: linear-gradient(180deg, #0a1f33 0%, #001a29 100%);
+      color: #fff;
+      padding: 25px 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 3px 0 15px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .sidebar-logo {
+      font-size: 1.6em;
+      font-weight: 600;
+      margin-bottom: 30px;
+      color: #00bfff;
+      text-shadow: 0 0 10px rgba(0, 191, 255, 0.7);
+      text-align: center;
+    }
+
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar nav ul li {
+      margin: 18px 0;
+    }
+
+    .sidebar nav ul li a {
+      text-decoration: none;
+      color: #cfe8ff;
+      font-weight: 500;
+      display: block;
+      transition: 0.3s ease;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+
+    .sidebar nav ul li a:hover,
+    .sidebar nav ul li a.active {
+      color: #fff;
+      background: linear-gradient(90deg, #00bfff, #00e0ff);
+      box-shadow: 0 0 12px rgba(0, 224, 255, 0.4);
+      transform: translateX(5px);
+    }
+
+    /* MOBILE HAMBURGER BUTTON */
+    .mobile-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-size: 1.8em;
+      cursor: pointer;
+      color: #00d0ff;
+      z-index: 9999;
+    }
+
+    /* ============================
+       MAIN CONTENT
+    ============================ */
+    .content {
+      flex: 1;
+      background: #0e1520;
+      position: relative;
+      padding: 20px;
+    }
+
+    h1 {
       text-align: center;
       margin-bottom: 30px;
-    }
-
-    .products-hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-    }
-
-    .products-hero h1 {
-      position: relative;
-      z-index: 2;
-      font-size: 2.2em;
       color: #00c3ff;
-      text-shadow: 0 0 12px rgba(0,195,255,0.6);
     }
 
-    .search-bar {
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      justify-items: center;
+    }
+
+    .product-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
       text-align: center;
-      margin-bottom: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s;
+      width: 100%;
+      max-width: 280px;
     }
 
-    .search-bar input {
-      width: 90%;
-      max-width: 480px;
-      padding: 14px 22px;
-      border-radius: 30px;
+    .product-card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-card h3 {
+      color: #00bfff;
+      margin-bottom: 10px;
+    }
+
+    .product-card p {
+      color: #d8ecff;
+      font-size: 0.95em;
+    }
+
+    /* ============================
+       FORM
+    ============================ */
+    .contact-form-section {
+      margin-top: 50px;
+      background: rgba(0,0,0,0.4);
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    .contact-form-section input,
+    .contact-form-section textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
       border: none;
-      background: #1f1f1f;
+    }
+
+    .contact-form-section button {
+      padding: 12px 25px;
+      background: linear-gradient(90deg, #00bfff, #00e0ff);
+      border: none;
+      border-radius: 30px;
       color: #fff;
-      font-size: 1em;
-      outline: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0,224,255,0.4);
       transition: all 0.3s;
     }
 
-    .search-bar input:focus {
-      background: #2a2a2a;
-      box-shadow: 0 0 12px #00c3ff;
-    }
-
-    .request-btn {
-      display: block;
-      margin: 20px auto 40px;
-      background: linear-gradient(45deg, #00c3ff, #00a1cc);
-      color: #111;
-      padding: 14px 32px;
-      font-weight: bold;
-      border-radius: 30px;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .request-btn:hover {
-      background: linear-gradient(45deg, #00a1cc, #0088aa);
+    .contact-form-section button:hover {
       transform: scale(1.05);
     }
 
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 25px;
-      padding: 0 25px 50px;
-    }
-
-    .card-wrapper {
-      perspective: 1000px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 18px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      transition: transform 0.6s, box-shadow 0.3s;
-      transform-style: preserve-3d;
-      position: relative;
-      cursor: pointer;
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    .card.visible {
-      opacity: 1;
-      transform: translateY(0);
-      transition: transform 0.6s, opacity 0.6s;
-    }
-
-    .card-front, .card-back {
-      backface-visibility: hidden;
-      border-radius: 18px;
-      padding: 20px;
-      position: relative;
-    }
-
-    .card-back {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #f0f0f0;
-      color: #333;
-      transform: rotateY(180deg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border-radius: 18px;
-    }
-
-    .card-wrapper:hover .card {
-      transform: rotateY(180deg) translateY(-8px);
-    }
-
-    .card img {
-      width: 130px;
-      height: 130px;
-      object-fit: contain;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      transition: transform 0.3s;
-    }
-
-    .card h3 {
-      font-size: 1.1em;
-      color: #0056b3;
-      margin: 10px 0 5px;
-    }
-
-    .card small {
-      color: #666;
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .price {
+    #formMessage {
+      margin-top: 10px;
       font-weight: bold;
-      font-size: 1.05em;
-      margin-bottom: 12px;
+      color: #ffdd00;
     }
 
-    .price.normal { color: #007bff; }
-    .price.request { color: #ffcc00; }
+    /* ============================
+       MOBILE RESPONSIVE
+    ============================ */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        height: 100%;
+        transition: 0.3s;
+        z-index: 999;
+      }
 
-    .overlay-btn {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
+      .sidebar.open {
+        left: 0;
+      }
+
+      .mobile-toggle {
+        display: block;
+      }
+
+      .container {
+        flex-direction: column;
+      }
+
+      .content {
+        margin-left: 0;
+      }
     }
 
-    .card-wrapper:hover .overlay-btn {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* Modal Overrides */
-    .modal {
-      background: #fff;
-      color: #333;
-    }
-
-    .modal button {
-      background: #007bff;
-      color: #fff;
-    }
-
-    .modal button:hover {
-      background: #0056b3;
-    }
   </style>
+
+  <script>
+    function toggleMenu() {
+      document.querySelector('.sidebar').classList.toggle('open');
+    }
+
+    async function submitForm(e) {
+      e.preventDefault();
+      const form = document.getElementById('cartridgeForm');
+      const messageEl = document.getElementById('formMessage');
+      messageEl.textContent = 'Sending...';
+
+      const data = {
+        name: form.name.value,
+        email: form.email.value,
+        cartridge: form.cartridge.value,
+        message: form.message.value
+      };
+
+      try {
+        const res = await fetch('/api/query', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if(result.success){
+          messageEl.textContent = 'Request sent successfully!';
+          form.reset();
+        } else {
+          messageEl.textContent = 'Failed to send request.';
+        }
+      } catch(err) {
+        messageEl.textContent = 'Error sending request.';
+      }
+    }
+  </script>
+
 </head>
 
 <body>
   <span class="mobile-toggle" onclick="toggleMenu()">☰</span>
 
   <div class="container">
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <h2 class="sidebar-logo">🖨️ Zwiitavhathu</h2>
       <nav>
@@ -209,175 +271,40 @@
       </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="content">
-      <section class="products-hero">
-        <h1>Our Printer Cartridges</h1>
+      <h1>Our Products</h1>
+
+      <div class="products-grid">
+        <div class="product-card">
+          <img src="images/cartridge1.jpg" alt="Cartridge 1">
+          <h3>Cartridge 1</h3>
+          <p>High quality black cartridge for reliable printing.</p>
+        </div>
+        <div class="product-card">
+          <img src="images/cartridge2.jpg" alt="Cartridge 2">
+          <h3>Cartridge 2</h3>
+          <p>Premium color cartridge for vivid prints.</p>
+        </div>
+        <!-- Add more product cards as needed -->
+      </div>
+
+      <section class="contact-form-section">
+        <h2>Can't Find Your Cartridge?</h2>
+        <form id="cartridgeForm" onsubmit="submitForm(event)">
+          <input type="text" name="name" placeholder="Your Name" required>
+          <input type="email" name="email" placeholder="Your Email" required>
+          <input type="text" name="cartridge" placeholder="Cartridge Model" required>
+          <textarea name="message" placeholder="Message (optional)"></textarea>
+          <button type="submit">Submit Request</button>
+          <p id="formMessage"></p>
+        </form>
       </section>
 
-      <div class="search-bar">
-        <input id="searchInput" placeholder="🔍 Search by name or code…">
-      </div>
-
-      <button class="request-btn" onclick="openGeneralRequest()">
-        💬 Can't Find Your Cartridge? Request It Here
-      </button>
-
-      <div id="product-container" class="product-grid"></div>
-
-      <!-- Modal -->
-      <div id="modal-bg" class="modal-bg">
-        <div class="modal">
-          <h2 id="modalTitle">Request</h2>
-          <input id="customerName" placeholder="Your Name">
-          <input id="customerEmail" placeholder="Your Email">
-          <select id="printerType">
-            <option value="">Select Printer Brand</option>
-            <option>HP</option>
-            <option>Canon</option>
-            <option>Epson</option>
-            <option>Brother</option>
-            <option>Other</option>
-          </select>
-          <div id="quantitySection">
-            <input type="number" id="quantity" min="1" value="1">
-          </div>
-          <div id="notesSection">
-            <textarea id="notes" rows="3" placeholder="Describe the cartridge you need…"></textarea>
-          </div>
-          <button id="submitOrder">Submit</button>
-        </div>
-      </div>
-
+      <footer>
+        <p>© 2025 Zwiitavhathu Cartridges | Designed by Rotondwa</p>
+      </footer>
     </main>
   </div>
-
-  <script>
-    // Mobile Menu Toggle
-    function toggleMenu() {
-      document.querySelector('.sidebar').classList.toggle('open');
-    }
-
-    let selectedProduct = null;
-
-    /* Load Products */
-    async function loadProducts(query = "") {
-      const res = await fetch(`/api/cartridges?q=${encodeURIComponent(query)}`);
-      const products = await res.json();
-
-      const container = document.getElementById("product-container");
-      container.innerHTML = "";
-
-      const filtered = products.filter(p => p.price || p.is_query_only);
-
-      filtered.forEach(p => {
-        const cardWrapper = document.createElement("div");
-        cardWrapper.className = "card-wrapper";
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        const image = p.image || "default.jpg";
-        const priceText = p.price ? `R${p.price}` : "Price on Request";
-        const isQuery = !p.price;
-
-        card.innerHTML = `
-          <div class="card-front">
-            <img src="images/${image}" onerror="this.src='images/default.jpg'">
-            <h3>${p.name}</h3>
-            ${p.code ? `<small>Code: ${p.code}</small>` : ""}
-            <div class="price ${isQuery ? 'request' : 'normal'}">${priceText}</div>
-            <button class="order-btn overlay-btn" onclick="openModal(${p.id}, ${isQuery})">
-              ${isQuery ? "💬 Query Price" : "🛒 Order Now"}
-            </button>
-          </div>
-        `;
-
-        cardWrapper.appendChild(card);
-        container.appendChild(cardWrapper);
-
-        setTimeout(() => card.classList.add("visible"), 100);
-      });
-
-      if (!container.innerHTML.trim()) {
-        container.innerHTML = "<p>No matching cartridges found.</p>";
-      }
-    }
-
-    /* Open Modal */
-    function openModal(id, isQueryOnly) {
-      selectedProduct = { id, isQueryOnly };
-      document.getElementById("modal-bg").style.display = "flex";
-      document.getElementById("modalTitle").innerText =
-        isQueryOnly ? "Query Price" : "Place Your Order";
-
-      document.getElementById("quantitySection").style.display =
-        isQueryOnly ? "none" : "block";
-
-      document.getElementById("notesSection").style.display =
-        isQueryOnly ? "block" : "none";
-    }
-
-    /* General Request */
-    function openGeneralRequest() {
-      selectedProduct = { id: null, isQueryOnly: true };
-      document.getElementById("modal-bg").style.display = "flex";
-      document.getElementById("modalTitle").innerText = "Request a Cartridge";
-      document.getElementById("quantitySection").style.display = "none";
-      document.getElementById("notesSection").style.display = "block";
-    }
-
-    /* Close Modal */
-    document.getElementById("modal-bg").addEventListener("click", e => {
-      if (e.target.id === "modal-bg") {
-        document.getElementById("modal-bg").style.display = "none";
-      }
-    });
-
-    /* Submit Request/Order */
-    document.getElementById("submitOrder").addEventListener("click", async () => {
-      const name = customerName.value.trim();
-      const email = customerEmail.value.trim();
-      const type = printerType.value;
-      const qty = quantity.value;
-      const noteText = notes.value.trim();
-
-      if (!name || !email) return alert("Please complete required fields.");
-
-      let url, body;
-
-      if (selectedProduct.id) {
-        url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
-        body = selectedProduct.isQueryOnly
-          ? { name, email, printerType: type, productId: selectedProduct.id, notes: noteText }
-          : { name, email, printerType: type, productId: selectedProduct.id, quantity: qty };
-      } else {
-        url = "/api/query";
-        body = { name, email, printerType: type, productId: 0, notes: noteText };
-      }
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-
-      const result = await res.json();
-      if (result.success) {
-        alert("Your request was sent successfully!");
-        document.getElementById("modal-bg").style.display = "none";
-      } else {
-        alert("Error: " + result.error);
-      }
-    });
-
-    /* Search */
-    document.getElementById("searchInput").addEventListener("input", e => {
-      loadProducts(e.target.value);
-    });
-
-    /* Load on Start */
-    loadProducts();
-  </script>
 </body>
 </html>
+
