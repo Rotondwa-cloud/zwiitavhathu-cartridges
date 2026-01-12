@@ -56,13 +56,12 @@ CREATE TABLE IF NOT EXISTS cartridges (
 );
 `);
 
-// Orders table with phone field
+// Orders table
 db.exec(`
 CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   customer_name TEXT,
   customer_email TEXT,
-  customer_phone TEXT,
   printer_type TEXT,
   product_id INTEGER,
   quantity INTEGER,
@@ -71,6 +70,15 @@ CREATE TABLE IF NOT EXISTS orders (
   FOREIGN KEY (product_id) REFERENCES cartridges(id)
 );
 `);
+
+// Ensure customer_phone column exists (for existing databases)
+try {
+  db.prepare("ALTER TABLE orders ADD COLUMN customer_phone TEXT").run();
+} catch (err) {
+  if (!err.message.includes("duplicate column name")) {
+    console.error("❌ Failed to add customer_phone column:", err);
+  }
+}
 
 // Cartridge requests table
 db.exec(`
@@ -88,7 +96,7 @@ CREATE TABLE IF NOT EXISTS cartridge_requests (
 console.log("✅ SQLite ready");
 
 /* ===============================
-   GMAIL API SETUP (NO SMTP)
+   GMAIL API SETUP
 ================================ */
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -100,16 +108,15 @@ oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
-// Encode subject properly for UTF-8 special characters
+// Encode UTF-8 subject
 function encodeUTF8Base64(str) {
   return `=?UTF-8?B?${Buffer.from(str, 'utf-8').toString('base64')}?=`;
 }
 
-// Send email function
+// Send email
 async function sendMail({ subject, html, to }) {
   try {
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-
     const messageParts = [
       `From: "Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
       `To: ${to || process.env.GOOGLE_EMAIL}`,
@@ -119,23 +126,15 @@ async function sendMail({ subject, html, to }) {
       '',
       html
     ];
-
     const message = messageParts.join('\n');
-
     const encodedMessage = Buffer.from(message)
       .toString('base64')
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=+$/, '');
-
-    const res = await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: { raw: encodedMessage }
-    });
-
-    console.log("📧 Email sent successfully:", res.data.id);
+    const res = await gmail.users.messages.send({ userId: 'me', requestBody: { raw: encodedMessage } });
+    console.log("📧 Email sent:", res.data.id);
     return res.data;
-
   } catch (err) {
     console.error("❌ Gmail API error:", err.message || err);
     throw err;
@@ -158,7 +157,7 @@ app.get('/test-email', async (req, res) => {
 });
 
 /* ===============================
-   IMPORT CARTRIDGES FROM DOCX
+   IMPORT CARTRIDGES
 ================================ */
 app.get('/api/import-cartridges', async (req, res) => {
   try {
@@ -172,30 +171,23 @@ app.get('/api/import-cartridges', async (req, res) => {
     const codeRegex = /\b([A-Z]{1,4}\d{1,4}[A-Z0-9\-]*)\b/;
 
     db.exec("DELETE FROM cartridges");
-
     const insert = db.prepare(`
       INSERT INTO cartridges (name, description, price, image, code, is_query_only)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
 
     let count = 0;
-
     for (const line of lines) {
       const priceMatch = line.match(priceRegex);
       const codeMatch = line.match(codeRegex);
-
       const price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : null;
       const code = codeMatch ? codeMatch[1] : null;
       const name = line.replace(priceRegex, '').replace(codeRegex, '').trim();
-
       if (!name || name.length < 3) continue;
-
       insert.run(name, name, price, "default.jpg", code, price ? 0 : 1);
       count++;
     }
-
     res.json({ success: true, imported: count });
-
   } catch (err) {
     console.error("❌ Import error:", err);
     res.status(500).json({ error: "Import failed" });
@@ -203,7 +195,7 @@ app.get('/api/import-cartridges', async (req, res) => {
 });
 
 /* ===============================
-   GET PRODUCTS (PRICED ONLY)
+   GET PRODUCTS
 ================================ */
 app.get('/api/cartridges', (req, res) => {
   try {
@@ -211,7 +203,9 @@ app.get('/api/cartridges', (req, res) => {
     const rows = db.prepare(`
       SELECT *
       FROM cartridges
-      WHERE price IS NOT NULL AND is_query_only = 0 AND (name LIKE ? OR code LIKE ?)
+      WHERE price IS NOT NULL
+        AND is_query_only = 0
+        AND (name LIKE ? OR code LIKE ?)
       ORDER BY name
     `).all(q, q);
     res.json(rows);
@@ -244,26 +238,30 @@ app.post('/api/order', async (req, res) => {
     await sendMail({
       subject: `Order Confirmation – ${product.name}`,
       to: email,
-      html: `<h2>Order Confirmation</h2>
-             <p>Thank you, ${name}, for your order!</p>
-             <p><strong>Product:</strong> ${product.name}</p>
-             <p><strong>Quantity:</strong> ${quantity}</p>
-             <p><strong>Total:</strong> R${total.toFixed(2)}</p>
-             <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-             <p>We will process your order shortly.</p>`
+      html: `
+        <h2>Order Confirmation</h2>
+        <p>Thank you, ${name}, for your order!</p>
+        <p><strong>Product:</strong> ${product.name}</p>
+        <p><strong>Quantity:</strong> ${quantity}</p>
+        <p><strong>Total:</strong> R${total.toFixed(2)}</p>
+        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p>We will process your order shortly.</p>
+      `
     });
 
     // Admin email
     await sendMail({
       subject: `New Order – ${product.name}`,
-      html: `<h2>New Order Received</h2>
-             <p><strong>Customer Name:</strong> ${name}</p>
-             <p><strong>Email:</strong> ${email}</p>
-             <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-             <p><strong>Printer Type:</strong> ${printerType}</p>
-             <p><strong>Product:</strong> ${product.name}</p>
-             <p><strong>Quantity:</strong> ${quantity}</p>
-             <p><strong>Total:</strong> R${total.toFixed(2)}</p>`
+      html: `
+        <h2>New Order Received</h2>
+        <p><strong>Customer Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p><strong>Printer Type:</strong> ${printerType}</p>
+        <p><strong>Product:</strong> ${product.name}</p>
+        <p><strong>Quantity:</strong> ${quantity}</p>
+        <p><strong>Total:</strong> R${total.toFixed(2)}</p>
+      `
     });
 
     res.json({ success: true, orderId: result.lastInsertRowid });
@@ -285,16 +283,17 @@ app.post('/api/query', async (req, res) => {
 
     await sendMail({
       subject: `Price Query – ${product.name}`,
-      html: `<h2>New Price Query</h2>
-             <p><strong>Name:</strong> ${name}</p>
-             <p><strong>Email:</strong> ${email}</p>
-             <p><strong>Printer Type:</strong> ${printerType}</p>
-             <p><strong>Product:</strong> ${product.name}</p>
-             <p><strong>Notes:</strong> ${notes || 'None'}</p>`
+      html: `
+        <h2>New Price Query</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Printer Type:</strong> ${printerType}</p>
+        <p><strong>Product:</strong> ${product.name}</p>
+        <p><strong>Notes:</strong> ${notes || 'None'}</p>
+      `
     });
 
     res.json({ success: true });
-
   } catch (err) {
     console.error("❌ Query email error:", err);
     res.status(500).json({ error: "Email failed" });
@@ -307,35 +306,40 @@ app.post('/api/query', async (req, res) => {
 app.post('/api/request-cartridge', async (req, res) => {
   try {
     const { name, email, printerType, requestedItem, notes } = req.body;
-    if (!name || !email || !requestedItem) return res.status(400).json({ error: "Name, email, and requested item are required" });
+    if (!name || !email || !requestedItem)
+      return res.status(400).json({ error: "Name, email, and requested item are required" });
 
-    // Save request
+    // Save in DB
     db.prepare(`
       INSERT INTO cartridge_requests
       (customer_name, customer_email, printer_type, requested_item, notes)
       VALUES (?, ?, ?, ?, ?)
     `).run(name, email, printerType || '', requestedItem, notes || '');
 
-    // Admin notification
+    // Admin email
     await sendMail({
       subject: `Cartridge Request – ${requestedItem}`,
-      html: `<h2>New Cartridge Request</h2>
-             <p><strong>Customer Name:</strong> ${name}</p>
-             <p><strong>Email:</strong> ${email}</p>
-             <p><strong>Printer Type:</strong> ${printerType || 'N/A'}</p>
-             <p><strong>Requested Cartridge:</strong> ${requestedItem}</p>
-             <p><strong>Notes:</strong> ${notes || 'None'}</p>`
+      html: `
+        <h2>New Cartridge Request</h2>
+        <p><strong>Customer Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Printer Type:</strong> ${printerType || 'N/A'}</p>
+        <p><strong>Requested Cartridge:</strong> ${requestedItem}</p>
+        <p><strong>Notes:</strong> ${notes || 'None'}</p>
+      `
     });
 
     // Customer confirmation
     await sendMail({
       subject: `We received your cartridge request – ${requestedItem}`,
       to: email,
-      html: `<h2>Cartridge Request Received</h2>
-             <p>Hi ${name},</p>
-             <p>Thank you for requesting <strong>${requestedItem}</strong>.</p>
-             <p>We will check our stock and contact you soon.</p>
-             <p>Regards,<br>Zwiitavhathu Cartridges</p>`
+      html: `
+        <h2>Cartridge Request Received</h2>
+        <p>Hi ${name},</p>
+        <p>Thank you for requesting <strong>${requestedItem}</strong>.</p>
+        <p>We will check our stock and contact you with further details soon.</p>
+        <p>Regards,<br>Zwiitavhathu Cartridges</p>
+      `
     });
 
     res.json({ success: true, message: "Request sent successfully" });
@@ -359,6 +363,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
