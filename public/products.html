@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zwiitavhathu Cartridges – Products</title>
 
   <style>
@@ -139,55 +139,18 @@
       font-size: 0.95em;
     }
 
-    /* ============================
-       FORM
-    ============================ */
-    .contact-form-section {
-      margin-top: 50px;
-      background: rgba(0,0,0,0.4);
-      padding: 25px;
-      border-radius: 15px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+    /* FOOTER */
+    footer {
       text-align: center;
+      padding: 20px;
+      background: rgba(0,0,0,0.8);
+      color: #a8c9ff;
+      font-size: 0.9em;
+      border-top: 1px solid rgba(0, 224, 255, 0.2);
+      margin-top: 40px;
     }
 
-    .contact-form-section input,
-    .contact-form-section textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: none;
-    }
-
-    .contact-form-section button {
-      padding: 12px 25px;
-      background: linear-gradient(90deg, #00bfff, #00e0ff);
-      border: none;
-      border-radius: 30px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      box-shadow: 0 4px 15px rgba(0,224,255,0.4);
-      transition: all 0.3s;
-    }
-
-    .contact-form-section button:hover {
-      transform: scale(1.05);
-    }
-
-    #formMessage {
-      margin-top: 10px;
-      font-weight: bold;
-      color: #ffdd00;
-    }
-
-    /* ============================
-       MOBILE RESPONSIVE
-    ============================ */
+    /* MOBILE RESPONSIVE */
     @media (max-width: 900px) {
       .sidebar {
         position: fixed;
@@ -221,37 +184,6 @@
     function toggleMenu() {
       document.querySelector('.sidebar').classList.toggle('open');
     }
-
-    async function submitForm(e) {
-      e.preventDefault();
-      const form = document.getElementById('cartridgeForm');
-      const messageEl = document.getElementById('formMessage');
-      messageEl.textContent = 'Sending...';
-
-      const data = {
-        name: form.name.value,
-        email: form.email.value,
-        cartridge: form.cartridge.value,
-        message: form.message.value
-      };
-
-      try {
-        const res = await fetch('/api/query', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        if(result.success){
-          messageEl.textContent = 'Request sent successfully!';
-          form.reset();
-        } else {
-          messageEl.textContent = 'Failed to send request.';
-        }
-      } catch(err) {
-        messageEl.textContent = 'Error sending request.';
-      }
-    }
   </script>
 
 </head>
@@ -280,25 +212,15 @@
           <h3>Cartridge 1</h3>
           <p>High quality black cartridge for reliable printing.</p>
         </div>
+
         <div class="product-card">
           <img src="images/cartridge2.jpg" alt="Cartridge 2">
           <h3>Cartridge 2</h3>
           <p>Premium color cartridge for vivid prints.</p>
         </div>
-        <!-- Add more product cards as needed -->
-      </div>
 
-      <section class="contact-form-section">
-        <h2>Can't Find Your Cartridge?</h2>
-        <form id="cartridgeForm" onsubmit="submitForm(event)">
-          <input type="text" name="name" placeholder="Your Name" required>
-          <input type="email" name="email" placeholder="Your Email" required>
-          <input type="text" name="cartridge" placeholder="Cartridge Model" required>
-          <textarea name="message" placeholder="Message (optional)"></textarea>
-          <button type="submit">Submit Request</button>
-          <p id="formMessage"></p>
-        </form>
-      </section>
+        <!-- Add more products here as needed -->
+      </div>
 
       <footer>
         <p>© 2025 Zwiitavhathu Cartridges | Designed by Rotondwa</p>
@@ -307,5 +229,6 @@
   </div>
 </body>
 </html>
+
 
 
