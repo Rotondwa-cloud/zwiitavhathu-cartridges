@@ -43,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 ================================ */
 const db = new Database(path.join(__dirname, 'database.db'));
 
+// Cartridges table
 db.exec(`
 CREATE TABLE IF NOT EXISTS cartridges (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,6 +56,7 @@ CREATE TABLE IF NOT EXISTS cartridges (
 );
 `);
 
+// Orders table with phone field
 db.exec(`
 CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,6 +72,7 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 `);
 
+// Cartridge requests table
 db.exec(`
 CREATE TABLE IF NOT EXISTS cartridge_requests (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,10 +105,9 @@ function encodeUTF8Base64(str) {
   return `=?UTF-8?B?${Buffer.from(str, 'utf-8').toString('base64')}?=`;
 }
 
+// Send email function
 async function sendMail({ subject, html, to }) {
   try {
-    console.log("📤 Sending email via Gmail API (HTTP)");
-
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
     const messageParts = [
@@ -120,8 +122,7 @@ async function sendMail({ subject, html, to }) {
 
     const message = messageParts.join('\n');
 
-    const encodedMessage = Buffer
-      .from(message)
+    const encodedMessage = Buffer.from(message)
       .toString('base64')
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
@@ -142,7 +143,7 @@ async function sendMail({ subject, html, to }) {
 }
 
 /* ===============================
-   TEST EMAIL (DEBUG)
+   TEST EMAIL
 ================================ */
 app.get('/test-email', async (req, res) => {
   try {
@@ -157,14 +158,12 @@ app.get('/test-email', async (req, res) => {
 });
 
 /* ===============================
-   IMPORT WORD DOCUMENT
+   IMPORT CARTRIDGES FROM DOCX
 ================================ */
 app.get('/api/import-cartridges', async (req, res) => {
   try {
     const filePath = path.join(__dirname, 'CARTRIDGE LIST FOR ZWIITABROTHERS Updated.docx');
-    if (!fs.existsSync(filePath)) {
-      return res.status(400).json({ error: "File missing" });
-    }
+    if (!fs.existsSync(filePath)) return res.status(400).json({ error: "File missing" });
 
     const result = await mammoth.extractRawText({ path: filePath });
     const lines = result.value.split('\n').map(l => l.trim()).filter(Boolean);
@@ -209,16 +208,12 @@ app.get('/api/import-cartridges', async (req, res) => {
 app.get('/api/cartridges', (req, res) => {
   try {
     const q = `%${(req.query.q || "").trim()}%`;
-
     const rows = db.prepare(`
       SELECT *
       FROM cartridges
-      WHERE price IS NOT NULL
-        AND is_query_only = 0
-        AND (name LIKE ? OR code LIKE ?)
+      WHERE price IS NOT NULL AND is_query_only = 0 AND (name LIKE ? OR code LIKE ?)
       ORDER BY name
     `).all(q, q);
-
     res.json(rows);
   } catch (err) {
     console.error("❌ Fetch products error:", err);
@@ -227,19 +222,15 @@ app.get('/api/cartridges', (req, res) => {
 });
 
 /* ===============================
-   PLACE ORDER (WITH PHONE & EMAIL)
+   PLACE ORDER
 ================================ */
 app.post('/api/order', async (req, res) => {
   try {
     const { name, email, phone, printerType, productId, quantity } = req.body;
 
-    const product = db.prepare(
-      "SELECT * FROM cartridges WHERE id=?"
-    ).get(productId);
-
-    if (!product || product.is_query_only || product.price === null) {
+    const product = db.prepare("SELECT * FROM cartridges WHERE id=?").get(productId);
+    if (!product || product.is_query_only || product.price === null)
       return res.status(400).json({ error: "Price query required" });
-    }
 
     const total = product.price * quantity;
 
@@ -249,41 +240,31 @@ app.post('/api/order', async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(name, email, phone || '', printerType, productId, quantity, total);
 
-    // === SEND EMAILS ===
-    try {
-      // Customer confirmation
-      await sendMail({
-        subject: `Order Confirmation – ${product.name}`,
-        to: email,
-        html: `
-          <h2>Order Confirmation</h2>
-          <p>Thank you, ${name}, for your order!</p>
-          <p><strong>Product:</strong> ${product.name}</p>
-          <p><strong>Quantity:</strong> ${quantity}</p>
-          <p><strong>Total:</strong> R${total.toFixed(2)}</p>
-          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-          <p>We will process your order shortly.</p>
-        `
-      });
+    // Customer email
+    await sendMail({
+      subject: `Order Confirmation – ${product.name}`,
+      to: email,
+      html: `<h2>Order Confirmation</h2>
+             <p>Thank you, ${name}, for your order!</p>
+             <p><strong>Product:</strong> ${product.name}</p>
+             <p><strong>Quantity:</strong> ${quantity}</p>
+             <p><strong>Total:</strong> R${total.toFixed(2)}</p>
+             <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+             <p>We will process your order shortly.</p>`
+    });
 
-      // Admin notification
-      await sendMail({
-        subject: `New Order – ${product.name}`,
-        html: `
-          <h2>New Order Received</h2>
-          <p><strong>Customer Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-          <p><strong>Printer Type:</strong> ${printerType}</p>
-          <p><strong>Product:</strong> ${product.name}</p>
-          <p><strong>Quantity:</strong> ${quantity}</p>
-          <p><strong>Total:</strong> R${total.toFixed(2)}</p>
-        `
-      });
-
-    } catch(emailErr) {
-      console.error("❌ Order email failed:", emailErr.message || emailErr);
-    }
+    // Admin email
+    await sendMail({
+      subject: `New Order – ${product.name}`,
+      html: `<h2>New Order Received</h2>
+             <p><strong>Customer Name:</strong> ${name}</p>
+             <p><strong>Email:</strong> ${email}</p>
+             <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+             <p><strong>Printer Type:</strong> ${printerType}</p>
+             <p><strong>Product:</strong> ${product.name}</p>
+             <p><strong>Quantity:</strong> ${quantity}</p>
+             <p><strong>Total:</strong> R${total.toFixed(2)}</p>`
+    });
 
     res.json({ success: true, orderId: result.lastInsertRowid });
 
@@ -294,30 +275,22 @@ app.post('/api/order', async (req, res) => {
 });
 
 /* ===============================
-   PRICE QUERY (EMAIL)
+   PRICE QUERY
 ================================ */
 app.post('/api/query', async (req, res) => {
   try {
     const { name, email, printerType, productId, notes } = req.body;
-
-    const product = db.prepare(
-      "SELECT * FROM cartridges WHERE id=?"
-    ).get(productId);
-
-    if (!product) {
-      return res.status(400).json({ error: "Product not found" });
-    }
+    const product = db.prepare("SELECT * FROM cartridges WHERE id=?").get(productId);
+    if (!product) return res.status(400).json({ error: "Product not found" });
 
     await sendMail({
       subject: `Price Query – ${product.name}`,
-      html: `
-        <h2>New Price Query</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Printer Type:</strong> ${printerType}</p>
-        <p><strong>Product:</strong> ${product.name}</p>
-        <p><strong>Notes:</strong> ${notes || 'None'}</p>
-      `
+      html: `<h2>New Price Query</h2>
+             <p><strong>Name:</strong> ${name}</p>
+             <p><strong>Email:</strong> ${email}</p>
+             <p><strong>Printer Type:</strong> ${printerType}</p>
+             <p><strong>Product:</strong> ${product.name}</p>
+             <p><strong>Notes:</strong> ${notes || 'None'}</p>`
     });
 
     res.json({ success: true });
@@ -329,47 +302,40 @@ app.post('/api/query', async (req, res) => {
 });
 
 /* ===============================
-   CARTRIDGE REQUEST (EMAIL)
+   CARTRIDGE REQUEST
 ================================ */
 app.post('/api/request-cartridge', async (req, res) => {
   try {
     const { name, email, printerType, requestedItem, notes } = req.body;
+    if (!name || !email || !requestedItem) return res.status(400).json({ error: "Name, email, and requested item are required" });
 
-    if (!name || !email || !requestedItem) {
-      return res.status(400).json({ error: "Name, email, and requested item are required" });
-    }
-
-    // Save request in DB
+    // Save request
     db.prepare(`
       INSERT INTO cartridge_requests
       (customer_name, customer_email, printer_type, requested_item, notes)
       VALUES (?, ?, ?, ?, ?)
     `).run(name, email, printerType || '', requestedItem, notes || '');
 
-    // Send email to admin
+    // Admin notification
     await sendMail({
       subject: `Cartridge Request – ${requestedItem}`,
-      html: `
-        <h2>New Cartridge Request</h2>
-        <p><strong>Customer Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Printer Type:</strong> ${printerType || 'N/A'}</p>
-        <p><strong>Requested Cartridge:</strong> ${requestedItem}</p>
-        <p><strong>Notes:</strong> ${notes || 'None'}</p>
-      `
+      html: `<h2>New Cartridge Request</h2>
+             <p><strong>Customer Name:</strong> ${name}</p>
+             <p><strong>Email:</strong> ${email}</p>
+             <p><strong>Printer Type:</strong> ${printerType || 'N/A'}</p>
+             <p><strong>Requested Cartridge:</strong> ${requestedItem}</p>
+             <p><strong>Notes:</strong> ${notes || 'None'}</p>`
     });
 
-    // Send confirmation email to customer
+    // Customer confirmation
     await sendMail({
       subject: `We received your cartridge request – ${requestedItem}`,
       to: email,
-      html: `
-        <h2>Cartridge Request Received</h2>
-        <p>Hi ${name},</p>
-        <p>Thank you for requesting <strong>${requestedItem}</strong>.</p>
-        <p>We will check our stock and contact you with further details soon.</p>
-        <p>Regards,<br>Zwiitavhathu Cartridges</p>
-      `
+      html: `<h2>Cartridge Request Received</h2>
+             <p>Hi ${name},</p>
+             <p>Thank you for requesting <strong>${requestedItem}</strong>.</p>
+             <p>We will check our stock and contact you soon.</p>
+             <p>Regards,<br>Zwiitavhathu Cartridges</p>`
     });
 
     res.json({ success: true, message: "Request sent successfully" });
@@ -393,6 +359,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
