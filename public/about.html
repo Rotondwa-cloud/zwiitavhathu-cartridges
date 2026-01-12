@@ -13,7 +13,8 @@
       font-family: 'Poppins', sans-serif;
       color: #fff;
       height: 100%;
-      background: #000;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      overflow-x: hidden;
     }
 
     .container {
@@ -24,26 +25,28 @@
     /* Sidebar */
     .sidebar {
       width: 230px;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, #0a1f33 0%, #001a29 100%);
       color: #fff;
-      padding: 20px;
+      padding: 25px 15px;
       display: flex;
       flex-direction: column;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.3);
+      position: relative;
     }
 
     .sidebar-logo {
-      font-size: 1.6em;
+      font-size: 1.8em;
       font-weight: 700;
       margin-bottom: 30px;
-      color: #00c3ff;
-      text-shadow: 0 0 12px #00c3ff;
+      color: #00bfff;
       text-align: center;
+      text-shadow: 0 0 15px rgba(0,191,255,0.7);
     }
 
     .sidebar nav ul {
       list-style: none;
       padding: 0;
+      margin: 0;
     }
 
     .sidebar nav ul li {
@@ -51,68 +54,82 @@
     }
 
     .sidebar nav ul li a {
-      color: #fff;
+      text-decoration: none;
+      color: #cfe8ff;
       font-weight: 500;
       display: block;
-      transition: 0.3s ease;
-      text-decoration: none;
-      text-align: left;
+      padding: 10px 15px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
     }
 
     .sidebar nav ul li a:hover,
     .sidebar nav ul li a.active {
-      color: #00c3ff;
+      color: #fff;
+      background: linear-gradient(90deg, #00bfff, #00e0ff);
       transform: translateX(5px);
+      box-shadow: 0 0 12px rgba(0,224,255,0.3);
+    }
+
+    .mobile-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-size: 1.8em;
+      cursor: pointer;
+      color: #00d0ff;
+      z-index: 9999;
     }
 
     /* Main content */
     .content {
       flex: 1;
       position: relative;
-      background: url('images/hp.jpg') center/cover no-repeat;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 40px 20px;
+      padding: 60px 20px;
     }
 
-    .content::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(5px);
-    }
-
+    /* Glass Card */
     .about-card {
       position: relative;
       z-index: 2;
-      max-width: 750px;
+      max-width: 800px;
       width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 0 25px rgba(0, 195, 255, 0.25);
-      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,0.08);
+      border-radius: 25px;
+      padding: 50px 40px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
       text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .about-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     }
 
     .about-card h2 {
-      font-size: 2.7em;
-      margin-bottom: 20px;
-      color: #fff;
+      font-size: 2.8em;
+      margin-bottom: 25px;
+      color: #00e0ff;
+      text-shadow: 0 0 10px rgba(0,224,255,0.6);
     }
 
     .highlight {
-      color: #00c3ff;
-      text-shadow: 0 0 12px #00c3ff;
+      font-weight: 700;
+      color: #ffd700;
+      text-shadow: 0 0 8px #ffd700;
     }
 
     .about-card p {
-      font-size: 1.15em;
-      color: #f0f7ff;
-      line-height: 1.7;
-      margin-bottom: 20px;
+      font-size: 1.2em;
+      line-height: 1.8;
+      margin-bottom: 25px;
+      color: #e0f7ff;
     }
 
     .about-card ul {
@@ -123,28 +140,31 @@
     }
 
     .about-card ul li {
-      background: rgba(255, 255, 255, 0.07);
-      padding: 12px 18px;
-      margin: 10px 0;
-      border-radius: 10px;
-      transition: 0.3s ease;
-      font-size: 1.05em;
+      background: rgba(255,255,255,0.06);
+      padding: 14px 18px;
+      margin: 12px 0;
+      border-radius: 12px;
+      font-size: 1.1em;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .about-card ul li:hover {
-      background: rgba(0, 195, 255, 0.18);
-      transform: translateX(7px);
+      background: rgba(0,224,255,0.2);
+      transform: translateX(10px);
+      box-shadow: 0 4px 20px rgba(0,224,255,0.25);
     }
 
     footer {
       text-align: center;
-      margin-top: 25px;
+      margin-top: 35px;
       color: #bbb;
       font-size: 0.9em;
-      z-index: 2;
     }
 
-    /* MOBILE RESPONSIVE */
+    /* Responsive */
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
@@ -154,7 +174,7 @@
         width: 100%;
         flex-direction: row;
         justify-content: center;
-        gap: 25px;
+        gap: 20px;
         padding: 15px;
       }
 
@@ -163,21 +183,23 @@
       }
 
       .about-card {
-        padding: 25px;
+        padding: 30px 20px;
       }
 
       .about-card h2 {
-        font-size: 2em;
+        font-size: 2.2em;
       }
 
-      .content {
-        padding: 20px;
+      .about-card p {
+        font-size: 1em;
       }
     }
   </style>
 </head>
 
 <body>
+  <span class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</span>
+
   <div class="container">
 
     <!-- Sidebar -->
@@ -225,3 +247,4 @@
   </div>
 </body>
 </html>
+
