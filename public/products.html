@@ -6,7 +6,6 @@
 <title>Zwiitavhathu Cartridges – Products</title>
 
 <style>
-/* === Reset & Body === */
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
@@ -15,7 +14,6 @@ body {
   overflow-x: hidden;
 }
 
-/* === Header === */
 header {
   background: #1c1c1c;
   padding: 20px;
@@ -27,11 +25,9 @@ header a {
   margin: 0 20px;
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.3s;
 }
 header a:hover { color: #00cc99; }
 
-/* === Title === */
 h1 {
   text-align: center;
   margin: 30px 0 15px;
@@ -40,7 +36,6 @@ h1 {
   text-shadow: 0 0 8px rgba(0,255,198,0.5);
 }
 
-/* === Search === */
 .search-bar {
   text-align: center;
   margin-bottom: 25px;
@@ -54,15 +49,12 @@ h1 {
   background: #1f1f1f;
   color: #fff;
   font-size: 1em;
-  outline: none;
-  transition: all 0.3s;
 }
 .search-bar input:focus {
   background: #2a2a2a;
   box-shadow: 0 0 12px #00ffc6;
 }
 
-/* === Request Button === */
 .request-btn {
   display: block;
   margin: 20px auto 40px;
@@ -73,14 +65,12 @@ h1 {
   border-radius: 30px;
   border: none;
   cursor: pointer;
-  transition: 0.3s;
 }
 .request-btn:hover {
   background: linear-gradient(45deg, #00cc99, #00b387);
   transform: scale(1.05);
 }
 
-/* === Product Grid === */
 .container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -88,61 +78,15 @@ h1 {
   padding: 0 25px 50px;
 }
 
-/* === Card Container for Flip Effect === */
-.card-wrapper {
-  perspective: 1000px;
-}
-
-/* === Card Style === */
 .card {
   background: #1f1f1f;
   border-radius: 18px;
   text-align: center;
   box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  position: relative;
-  cursor: pointer;
-  opacity: 0;
-  transform: translateY(30px);
-}
-.card.visible { 
-  opacity: 1; 
-  transform: translateY(0); 
-  transition: transform 0.6s, opacity 0.6s;
-}
-.card:hover {
-  transform: translateY(-8px) rotateY(0deg);
-  box-shadow: 0 12px 24px rgba(0,255,198,0.4);
-}
-
-/* === Card Front & Back === */
-.card-front, .card-back {
-  backface-visibility: hidden;
-  border-radius: 18px;
   padding: 20px;
   position: relative;
+  transition: transform 0.3s;
 }
-.card-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #1a1a1a;
-  color: #fff;
-  transform: rotateY(180deg);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* Flip effect on hover */
-.card-wrapper:hover .card {
-  transform: rotateY(180deg) translateY(-8px);
-}
-
-/* === Product Image === */
 .card img {
   width: 130px;
   height: 130px;
@@ -151,43 +95,29 @@ h1 {
   padding: 10px;
   border-radius: 12px;
   margin-bottom: 15px;
-  transition: transform 0.3s;
 }
-
-/* === Product Info === */
-.card h3 {
-  font-size: 1.1em;
-  color: #00ffc6;
-  margin: 10px 0 5px;
-}
-.card small {
-  color: #bbb;
-  display: block;
-  margin-bottom: 8px;
-}
-.price {
-  font-weight: bold;
-  font-size: 1.05em;
-  margin-bottom: 12px;
-}
+.card h3 { color: #00ffc6; margin: 10px 0 5px; }
+.card small { color: #bbb; display: block; margin-bottom: 8px; }
+.price { font-weight: bold; font-size: 1.05em; margin-bottom: 12px; }
 .price.normal { color: #00ffc6; }
 .price.request { color: #ffcc00; }
 
-/* === Order Button Overlay === */
-.overlay-btn {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s, transform 0.3s;
+.order-btn {
+  display: inline-block;
+  margin-top: 12px;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  color: #111;
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
 }
-.card-wrapper:hover .overlay-btn {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+.order-btn:hover {
+  background: linear-gradient(45deg, #00cc99, #00b387);
 }
 
-/* === Modal === */
+/* Modal */
 .modal-bg {
   display: none;
   position: fixed;
@@ -224,11 +154,11 @@ h1 {
   color: #111;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
 }
 .modal button:hover {
   background: linear-gradient(45deg, #00cc99, #00b387);
 }
+
 </style>
 </head>
 
@@ -268,76 +198,44 @@ h1 {
       <option>Other</option>
     </select>
 
-    <div id="quantitySection">
-      <input type="number" id="quantity" min="1" value="1">
-    </div>
-
-    <div id="notesSection">
-      <textarea id="notes" rows="3" placeholder="Describe the cartridge you need…"></textarea>
-    </div>
+    <input type="number" id="quantity" min="1" value="1" style="display:none;">
+    <textarea id="notes" rows="3" placeholder="Describe the cartridge you need…"></textarea>
 
     <button id="submitOrder">Submit</button>
   </div>
 </div>
 
 <script>
+let products = []; // will hold fetched products
 let selectedProduct = null;
 
 /* Load Products */
 async function loadProducts(query = "") {
   const res = await fetch(`/api/cartridges?q=${encodeURIComponent(query)}`);
-  const products = await res.json();
+  products = await res.json();
 
   const container = document.getElementById("product-container");
   container.innerHTML = "";
 
-  const filtered = products.filter(p => p.price || p.is_query_only);
-
-  filtered.forEach(p => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "card-wrapper";
-
+  products.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
 
-    const image = p.image || "default.jpg";
     const priceText = p.price ? `R${p.price}` : "Price on Request";
     const isQuery = !p.price;
 
     card.innerHTML = `
-      <div class="card-front">
-        <img src="images/${image}" onerror="this.src='images/default.jpg'">
-        <h3>${p.name}</h3>
-        ${p.code ? `<small>Code: ${p.code}</small>` : ""}
-        <div class="price ${isQuery ? 'request' : 'normal'}">${priceText}</div>
-      </div>
-      <div class="card-back">
-        <p>${isQuery ? "Contact us for pricing details." : "Click below to order."}</p>
-      </div>
-      <button class="order-btn overlay-btn" onclick="openModal(${p.id}, ${isQuery})">
+      <img src="images/${p.image || 'default.jpg'}" onerror="this.src='images/default.jpg'">
+      <h3>${p.name}</h3>
+      ${p.code ? `<small>Code: ${p.code}</small>` : ""}
+      <div class="price ${isQuery ? 'request' : 'normal'}">${priceText}</div>
+      <button class="order-btn" onclick="openModal(${p.id}, ${isQuery})">
         ${isQuery ? "💬 Query Price" : "🛒 Order Now"}
       </button>
     `;
 
-    wrapper.appendChild(card);
-    container.appendChild(wrapper);
+    container.appendChild(card);
   });
-
-  fadeInCards();
-  if (!container.innerHTML.trim()) {
-    container.innerHTML = "<p>No matching cartridges found.</p>";
-  }
-}
-
-/* Fade-in on scroll */
-function fadeInCards() {
-  const cards = document.querySelectorAll(".card");
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) entry.target.classList.add("visible");
-    });
-  }, { threshold: 0.1 });
-  cards.forEach(card => observer.observe(card));
 }
 
 /* Open Modal */
@@ -347,10 +245,10 @@ function openModal(id, isQueryOnly) {
   document.getElementById("modalTitle").innerText =
     isQueryOnly ? "Query Price" : "Place Your Order";
 
-  document.getElementById("quantitySection").style.display =
+  document.getElementById("quantity").style.display =
     isQueryOnly ? "none" : "block";
 
-  document.getElementById("notesSection").style.display =
+  document.getElementById("notes").style.display =
     isQueryOnly ? "block" : "none";
 }
 
@@ -361,8 +259,8 @@ function openGeneralRequest() {
   document.getElementById("modal-bg").style.display = "flex";
   document.getElementById("modalTitle").innerText = "Request a Cartridge";
 
-  document.getElementById("quantitySection").style.display = "none";
-  document.getElementById("notesSection").style.display = "block";
+  document.getElementById("quantity").style.display = "none";
+  document.getElementById("notes").style.display = "block";
 }
 
 /* Close Modal */
@@ -374,38 +272,36 @@ document.getElementById("modal-bg").addEventListener("click", e => {
 
 /* Submit Request/Order */
 document.getElementById("submitOrder").addEventListener("click", async () => {
-  const name = customerName.value.trim();
-  const email = customerEmail.value.trim();
-  const type = printerType.value;
-  const qty = quantity.value;
-  const noteText = notes.value.trim();
+  const name = document.getElementById("customerName").value.trim();
+  const email = document.getElementById("customerEmail").value.trim();
+  const type = document.getElementById("printerType").value;
+  const qty = document.getElementById("quantity").value;
+  const noteText = document.getElementById("notes").value.trim();
 
   if (!name || !email) return alert("Please complete required fields.");
 
-  let url, body;
+  const body = selectedProduct.id
+    ? { name, email, printerType: type, productId: selectedProduct.id, quantity: qty, notes: noteText }
+    : { name, email, printerType: type, notes: noteText };
 
-  if (selectedProduct.id) {
-    url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
-    body = selectedProduct.isQueryOnly
-      ? { name, email, printerType: type, productId: selectedProduct.id, notes: noteText }
-      : { name, email, printerType: type, productId: selectedProduct.id, quantity: qty };
-  } else {
-    url = "/api/query";
-    body = { name, email, printerType: type, productId: 0, notes: noteText };
-  }
+  const url = "/api/query"; // always send to /api/query for simplicity
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const result = await res.json();
 
-  const result = await res.json();
-  if (result.success) {
-    alert("Your request was sent successfully!");
-    document.getElementById("modal-bg").style.display = "none";
-  } else {
-    alert("Error: " + result.error);
+    if (result.success) {
+      alert("Your request was sent successfully!");
+      document.getElementById("modal-bg").style.display = "none";
+    } else {
+      alert("Error: " + result.error);
+    }
+  } catch (err) {
+    alert("Server error. Please try again later.");
   }
 });
 
@@ -414,9 +310,10 @@ document.getElementById("searchInput").addEventListener("input", e => {
   loadProducts(e.target.value);
 });
 
-/* Load on Start */
+/* Load Products on Start */
 loadProducts();
 </script>
 
 </body>
 </html>
+
