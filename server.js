@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   customer_name TEXT,
   customer_email TEXT,
+  customer_phone TEXT,
   printer_type TEXT,
   product_id INTEGER,
   quantity INTEGER,
@@ -128,9 +129,7 @@ async function sendMail({ subject, html, to }) {
 
     const res = await gmail.users.messages.send({
       userId: 'me',
-      requestBody: {
-        raw: encodedMessage
-      }
+      requestBody: { raw: encodedMessage }
     });
 
     console.log("📧 Email sent successfully:", res.data.id);
@@ -228,11 +227,11 @@ app.get('/api/cartridges', (req, res) => {
 });
 
 /* ===============================
-   PLACE ORDER (WITH EMAIL)
+   PLACE ORDER (WITH PHONE & EMAIL)
 ================================ */
 app.post('/api/order', async (req, res) => {
   try {
-    const { name, email, printerType, productId, quantity } = req.body;
+    const { name, email, phone, printerType, productId, quantity } = req.body;
 
     const product = db.prepare(
       "SELECT * FROM cartridges WHERE id=?"
@@ -246,12 +245,13 @@ app.post('/api/order', async (req, res) => {
 
     const result = db.prepare(`
       INSERT INTO orders
-      (customer_name, customer_email, printer_type, product_id, quantity, total)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(name, email, printerType, productId, quantity, total);
+      (customer_name, customer_email, customer_phone, printer_type, product_id, quantity, total)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(name, email, phone || '', printerType, productId, quantity, total);
 
-    // === SEND CUSTOMER CONFIRMATION EMAIL ===
+    // === SEND EMAILS ===
     try {
+      // Customer confirmation
       await sendMail({
         subject: `Order Confirmation – ${product.name}`,
         to: email,
@@ -261,17 +261,19 @@ app.post('/api/order', async (req, res) => {
           <p><strong>Product:</strong> ${product.name}</p>
           <p><strong>Quantity:</strong> ${quantity}</p>
           <p><strong>Total:</strong> R${total.toFixed(2)}</p>
+          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
           <p>We will process your order shortly.</p>
         `
       });
 
-      // Also send a copy to admin
+      // Admin notification
       await sendMail({
         subject: `New Order – ${product.name}`,
         html: `
           <h2>New Order Received</h2>
           <p><strong>Customer Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
           <p><strong>Printer Type:</strong> ${printerType}</p>
           <p><strong>Product:</strong> ${product.name}</p>
           <p><strong>Quantity:</strong> ${quantity}</p>
@@ -279,7 +281,6 @@ app.post('/api/order', async (req, res) => {
         `
       });
 
-      console.log("✅ Order emails sent");
     } catch(emailErr) {
       console.error("❌ Order email failed:", emailErr.message || emailErr);
     }
@@ -313,7 +314,7 @@ app.post('/api/query', async (req, res) => {
         <h2>New Price Query</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Printer:</strong> ${printerType}</p>
+        <p><strong>Printer Type:</strong> ${printerType}</p>
         <p><strong>Product:</strong> ${product.name}</p>
         <p><strong>Notes:</strong> ${notes || 'None'}</p>
       `
@@ -392,6 +393,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
