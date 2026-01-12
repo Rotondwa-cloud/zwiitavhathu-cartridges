@@ -69,6 +69,18 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 `);
 
+db.exec(`
+CREATE TABLE IF NOT EXISTS cartridge_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  customer_name TEXT,
+  customer_email TEXT,
+  printer_type TEXT,
+  requested_item TEXT,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+`);
+
 console.log("✅ SQLite ready");
 
 /* ===============================
@@ -98,7 +110,7 @@ async function sendMail({ subject, html, to }) {
     const messageParts = [
       `From: "Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
       `To: ${to || process.env.GOOGLE_EMAIL}`,
-      `Subject: ${encodeUTF8Base64(subject)}`, // <-- UTF-8 encoded subject
+      `Subject: ${encodeUTF8Base64(subject)}`,
       'MIME-Version: 1.0',
       'Content-Type: text/html; charset=utf-8',
       '',
@@ -136,7 +148,7 @@ async function sendMail({ subject, html, to }) {
 app.get('/test-email', async (req, res) => {
   try {
     await sendMail({
-      subject: "TEST EMAIL – Zwiitavhathu", // special char en dash included
+      subject: "TEST EMAIL – Zwiitavhathu",
       html: "<h1>If you see this, Gmail API works 🎉</h1>"
     });
     res.send("✅ Test email sent");
@@ -242,7 +254,7 @@ app.post('/api/order', async (req, res) => {
     try {
       await sendMail({
         subject: `Order Confirmation – ${product.name}`,
-        to: email, // sends to customer
+        to: email,
         html: `
           <h2>Order Confirmation</h2>
           <p>Thank you, ${name}, for your order!</p>
@@ -260,14 +272,14 @@ app.post('/api/order', async (req, res) => {
           <h2>New Order Received</h2>
           <p><strong>Customer Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Printer:</strong> ${printerType}</p>
+          <p><strong>Printer Type:</strong> ${printerType}</p>
           <p><strong>Product:</strong> ${product.name}</p>
           <p><strong>Quantity:</strong> ${quantity}</p>
           <p><strong>Total:</strong> R${total.toFixed(2)}</p>
         `
       });
 
-      console.log("✅ Order confirmation emails sent");
+      console.log("✅ Order emails sent");
     } catch(emailErr) {
       console.error("❌ Order email failed:", emailErr.message || emailErr);
     }
@@ -303,7 +315,7 @@ app.post('/api/query', async (req, res) => {
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Printer:</strong> ${printerType}</p>
         <p><strong>Product:</strong> ${product.name}</p>
-        <p><strong>Notes:</strong> ${notes || "None"}</p>
+        <p><strong>Notes:</strong> ${notes || 'None'}</p>
       `
     });
 
@@ -312,6 +324,58 @@ app.post('/api/query', async (req, res) => {
   } catch (err) {
     console.error("❌ Query email error:", err);
     res.status(500).json({ error: "Email failed" });
+  }
+});
+
+/* ===============================
+   CARTRIDGE REQUEST (EMAIL)
+================================ */
+app.post('/api/request-cartridge', async (req, res) => {
+  try {
+    const { name, email, printerType, requestedItem, notes } = req.body;
+
+    if (!name || !email || !requestedItem) {
+      return res.status(400).json({ error: "Name, email, and requested item are required" });
+    }
+
+    // Save request in DB
+    db.prepare(`
+      INSERT INTO cartridge_requests
+      (customer_name, customer_email, printer_type, requested_item, notes)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(name, email, printerType || '', requestedItem, notes || '');
+
+    // Send email to admin
+    await sendMail({
+      subject: `Cartridge Request – ${requestedItem}`,
+      html: `
+        <h2>New Cartridge Request</h2>
+        <p><strong>Customer Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Printer Type:</strong> ${printerType || 'N/A'}</p>
+        <p><strong>Requested Cartridge:</strong> ${requestedItem}</p>
+        <p><strong>Notes:</strong> ${notes || 'None'}</p>
+      `
+    });
+
+    // Send confirmation email to customer
+    await sendMail({
+      subject: `We received your cartridge request – ${requestedItem}`,
+      to: email,
+      html: `
+        <h2>Cartridge Request Received</h2>
+        <p>Hi ${name},</p>
+        <p>Thank you for requesting <strong>${requestedItem}</strong>.</p>
+        <p>We will check our stock and contact you with further details soon.</p>
+        <p>Regards,<br>Zwiitavhathu Cartridges</p>
+      `
+    });
+
+    res.json({ success: true, message: "Request sent successfully" });
+
+  } catch (err) {
+    console.error("❌ Cartridge request error:", err);
+    res.status(500).json({ error: "Request failed" });
   }
 });
 
@@ -328,6 +392,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
