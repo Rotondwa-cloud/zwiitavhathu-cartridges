@@ -283,6 +283,7 @@ h1 {
 
     <input id="customerName" placeholder="Your Name">
     <input id="customerEmail" placeholder="Your Email">
+    <input id="customerPhone" placeholder="Your Phone Number">
 
     <select id="printerType">
       <option value="">Select Printer Brand</option>
@@ -363,6 +364,7 @@ document.getElementById("modal-bg").onclick = e => {
 submitOrder.onclick = async () => {
   const name = customerName.value.trim();
   const email = customerEmail.value.trim();
+  const phoneVal = customerPhone.value.trim();
   const printerTypeVal = printerType.value;
   const qty = quantity.value;
   const notesVal = notes.value.trim();
@@ -375,7 +377,7 @@ submitOrder.onclick = async () => {
     url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
     body = selectedProduct.isQueryOnly
       ? { name, email, printerType: printerTypeVal, productId: selectedProduct.id, notes: notesVal }
-      : { name, email, printerType: printerTypeVal, productId: selectedProduct.id, quantity: qty };
+      : { name, email, phone: phoneVal, printerType: printerTypeVal, productId: selectedProduct.id, quantity: qty };
   } else {
     url = "/api/request-cartridge";
     body = { name, email, printerType: printerTypeVal, requestedItem: notesVal, notes: notesVal };
@@ -391,6 +393,13 @@ submitOrder.onclick = async () => {
   if (result.success) {
     alert("✅ Request sent successfully!");
     document.getElementById("modal-bg").style.display = "none";
+    // clear fields
+    customerName.value = "";
+    customerEmail.value = "";
+    customerPhone.value = "";
+    printerType.value = "";
+    quantity.value = 1;
+    notes.value = "";
   } else {
     alert("❌ " + (result.error || "Something went wrong"));
   }
@@ -405,6 +414,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
