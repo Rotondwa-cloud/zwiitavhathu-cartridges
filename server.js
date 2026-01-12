@@ -84,6 +84,11 @@ oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
+// Encode subject properly for UTF-8 special characters
+function encodeUTF8Base64(str) {
+  return `=?UTF-8?B?${Buffer.from(str, 'utf-8').toString('base64')}?=`;
+}
+
 async function sendMail({ subject, html, to }) {
   try {
     console.log("📤 Sending email via Gmail API (HTTP)");
@@ -93,7 +98,7 @@ async function sendMail({ subject, html, to }) {
     const messageParts = [
       `From: "Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
       `To: ${to || process.env.GOOGLE_EMAIL}`,
-      `Subject: ${subject}`,
+      `Subject: ${encodeUTF8Base64(subject)}`, // <-- UTF-8 encoded subject
       'MIME-Version: 1.0',
       'Content-Type: text/html; charset=utf-8',
       '',
@@ -131,7 +136,7 @@ async function sendMail({ subject, html, to }) {
 app.get('/test-email', async (req, res) => {
   try {
     await sendMail({
-      subject: "TEST EMAIL – Zwiitavhathu",
+      subject: "TEST EMAIL – Zwiitavhathu", // special char en dash included
       html: "<h1>If you see this, Gmail API works 🎉</h1>"
     });
     res.send("✅ Test email sent");
@@ -323,6 +328,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
