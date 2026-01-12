@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const mammoth = require('mammoth');
-const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 
 const app = express();
@@ -73,11 +72,9 @@ CREATE TABLE IF NOT EXISTS orders (
 console.log("✅ SQLite ready");
 
 /* ===============================
-   GMAIL API SETUP
+   GMAIL API SETUP (NO SMTP)
 ================================ */
-const OAuth2 = google.auth.OAuth2;
-
-const oauth2Client = new OAuth2(
+const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   "https://developers.google.com/oauthplayground"
@@ -89,41 +86,47 @@ oauth2Client.setCredentials({
 
 async function sendMail({ subject, html }) {
   try {
-    console.log("📤 Attempting to send email…");
+    console.log("📤 Sending email via Gmail API (HTTP)");
 
-    const { token } = await oauth2Client.getAccessToken();
-    if (!token) throw new Error("No access token generated");
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: process.env.GOOGLE_EMAIL,
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-        accessToken: token,
-      },
+    const messageParts = [
+      `From: "Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
+      `To: ${process.env.GOOGLE_EMAIL}`,
+      `Subject: ${subject}`,
+      'MIME-Version: 1.0',
+      'Content-Type: text/html; charset=utf-8',
+      '',
+      html
+    ];
+
+    const message = messageParts.join('\n');
+
+    const encodedMessage = Buffer
+      .from(message)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+    const res = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage
+      }
     });
 
-    const info = await transporter.sendMail({
-      from: `"Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
-      to: process.env.GOOGLE_EMAIL,
-      subject,
-      html,
-    });
-
-    console.log("📧 Email sent successfully:", info.messageId);
-    return info;
+    console.log("📧 Email sent successfully:", res.data.id);
+    return res.data;
 
   } catch (err) {
-    console.error("❌ Gmail sendMail error:", err.message || err);
+    console.error("❌ Gmail API error:", err.message || err);
     throw err;
   }
 }
 
 /* ===============================
-   TEST EMAIL (DEBUG ROUTE)
+   TEST EMAIL (DEBUG)
 ================================ */
 app.get('/test-email', async (req, res) => {
   try {
@@ -132,7 +135,7 @@ app.get('/test-email', async (req, res) => {
       html: "<h1>If you see this, Gmail API works 🎉</h1>"
     });
     res.send("✅ Test email sent");
-  } catch (err) {
+  } catch {
     res.status(500).send("❌ Test email failed");
   }
 });
@@ -242,8 +245,6 @@ app.post('/api/order', (req, res) => {
    PRICE QUERY (EMAIL)
 ================================ */
 app.post('/api/query', async (req, res) => {
-  console.log("📩 /api/query HIT:", req.body);
-
   try {
     const { name, email, printerType, productId, notes } = req.body;
 
@@ -288,5 +289,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
