@@ -1,250 +1,411 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Products – Zwiitavhathu Cartridges</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zwiitavhathu Cartridges – Products</title>
 
-  <style>
-    /* ===== GLOBAL ===== */
-    body, html {
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background: #0a0a0f;
-      color: #fff;
-      overflow-x: hidden;
-    }
+<style>
+/* ================= GLOBAL ================= */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #121212;
+  color: #fff;
+}
 
-    /* ===== LAYOUT ===== */
-    .container {
-      display: flex;
-      min-height: 100vh;
-    }
+/* ================= LAYOUT ================= */
+.page {
+  display: flex;
+  min-height: 100vh;
+}
 
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      width: 230px;
-      background: linear-gradient(180deg, #0a1f33, #001a29);
-      padding: 25px 20px;
-      box-shadow: 3px 0 15px rgba(0,0,0,0.5);
-    }
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 220px;
+  background: #0f1c2d;
+  padding: 25px 20px;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+}
 
-    .sidebar-logo {
-      font-size: 1.6em;
-      font-weight: 600;
-      margin-bottom: 30px;
-      color: #00bfff;
-      text-align: center;
-    }
+.sidebar h2 {
+  color: #00ffc6;
+  text-align: center;
+  margin-bottom: 30px;
+}
 
-    .sidebar nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+.sidebar a {
+  display: block;
+  color: #cfe8ff;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
 
-    .sidebar nav ul li {
-      margin: 18px 0;
-    }
+.sidebar a:hover,
+.sidebar a.active {
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  color: #111;
+}
 
-    .sidebar nav ul li a {
-      text-decoration: none;
-      color: #cfe8ff;
-      display: block;
-      padding: 8px 12px;
-      border-radius: 8px;
-      transition: 0.3s;
-    }
+/* ================= MOBILE TOGGLE ================= */
+.mobile-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  font-size: 1.8em;
+  color: #00ffc6;
+  z-index: 999;
+  cursor: pointer;
+}
 
-    .sidebar nav ul li a:hover,
-    .sidebar nav ul li a.active {
-      background: linear-gradient(90deg, #00bfff, #00e0ff);
-      color: #fff;
-      transform: translateX(5px);
-    }
+/* ================= CONTENT ================= */
+.content {
+  flex: 1;
+}
 
-    /* ===== MOBILE MENU ===== */
-    .mobile-toggle {
-      display: none;
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      font-size: 1.8em;
-      color: #00d0ff;
-      cursor: pointer;
-      z-index: 9999;
-    }
+/* ================= HEADER ================= */
+header {
+  background: #1c1c1c;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 2px solid #00ffc6;
+}
 
-    /* ===== CONTENT ===== */
-    .content {
-      flex: 1;
-      padding: 40px 25px;
-      background: #0e1520;
-    }
+header a {
+  color: #00ffc6;
+  margin: 0 20px;
+  text-decoration: none;
+  font-weight: 600;
+}
 
-    .page-title {
-      text-align: center;
-      margin-bottom: 40px;
-    }
+header a:hover {
+  color: #00cc99;
+}
 
-    .page-title h1 {
-      font-size: 2.3em;
-      color: #00c3ff;
-    }
+/* ================= TITLE ================= */
+h1 {
+  text-align: center;
+  margin: 30px 0 15px;
+  font-size: 2.5em;
+  color: #00ffc6;
+}
 
-    .page-title p {
-      color: #cfe8ff;
-    }
+/* ================= SEARCH ================= */
+.search-bar {
+  text-align: center;
+  margin-bottom: 25px;
+}
 
-    /* ===== PRODUCTS GRID ===== */
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 25px;
-      max-width: 1100px;
-      margin: auto;
-    }
+.search-bar input {
+  width: 90%;
+  max-width: 480px;
+  padding: 14px 22px;
+  border-radius: 30px;
+  border: none;
+  background: #1f1f1f;
+  color: #fff;
+}
 
-    .product-card {
-      background: rgba(255,255,255,0.05);
-      padding: 20px;
-      border-radius: 15px;
-      text-align: center;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-      transition: transform 0.3s;
-    }
+/* ================= REQUEST BUTTON ================= */
+.request-btn {
+  display: block;
+  margin: 20px auto 40px;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  color: #111;
+  padding: 14px 32px;
+  font-weight: bold;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+}
 
-    .product-card:hover {
-      transform: translateY(-8px);
-    }
+.request-btn:hover {
+  transform: scale(1.05);
+}
 
-    .product-card h3 {
-      color: #00bfff;
-      margin-bottom: 10px;
-    }
+/* ================= PRODUCTS ================= */
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 25px;
+  padding: 0 25px 50px;
+}
 
-    .product-card p {
-      font-size: 0.95em;
-      color: #ddd;
-    }
+.card {
+  background: #1f1f1f;
+  border-radius: 18px;
+  text-align: center;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
 
-    .product-card button {
-      margin-top: 15px;
-      background: linear-gradient(90deg, #00bfff, #00e0ff);
-      border: none;
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 25px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.card img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+}
 
-    /* ===== FOOTER ===== */
-    footer {
-      text-align: center;
-      margin-top: 50px;
-      padding: 20px;
-      color: #a8c9ff;
-      font-size: 0.9em;
-      border-top: 1px solid rgba(0,224,255,0.2);
-    }
+.card h3 {
+  color: #00ffc6;
+  font-size: 1.1em;
+}
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 900px) {
-      .sidebar {
-        position: fixed;
-        left: -260px;
-        top: 0;
-        height: 100%;
-        transition: 0.3s;
-        z-index: 999;
-      }
+.price {
+  font-weight: bold;
+  margin: 10px 0;
+}
 
-      .sidebar.open {
-        left: 0;
-      }
+.price.request {
+  color: #ffcc00;
+}
 
-      .mobile-toggle {
-        display: block;
-      }
+.card button {
+  margin-top: 10px;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-      .container {
-        flex-direction: column;
-      }
-    }
-  </style>
+/* ================= MODAL ================= */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
 
-  <script>
-    function toggleMenu() {
-      document.querySelector('.sidebar').classList.toggle('open');
-    }
-  </script>
+.modal {
+  background: #1c1c1c;
+  padding: 25px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 360px;
+}
 
+.modal input,
+.modal select,
+.modal textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: none;
+  background: #222;
+  color: #fff;
+}
+
+.modal button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  font-weight: bold;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    left: -240px;
+    top: 0;
+    height: 100%;
+    transition: 0.3s;
+    z-index: 998;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .mobile-toggle {
+    display: block;
+  }
+
+  .page {
+    flex-direction: column;
+  }
+}
+</style>
 </head>
+
 <body>
 
-<span class="mobile-toggle" onclick="toggleMenu()">☰</span>
+<span class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</span>
 
-<div class="container">
+<div class="page">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h2 class="sidebar-logo">🖨️ Zwiitavhathu</h2>
-    <nav>
-      <ul>
-        <li><a href="index.html">🏠 Home</a></li>
-        <li><a href="products.html" class="active">🛒 Products</a></li>
-        <li><a href="about.html">ℹ️ About Us</a></li>
-      </ul>
-    </nav>
+    <h2>🖨️ Zwiitavhathu</h2>
+    <a href="/" >🏠 Home</a>
+    <a href="/products" class="active">🖨️ Products</a>
+    <a href="/about">ℹ️ About</a>
   </aside>
 
   <!-- CONTENT -->
-  <main class="content">
+  <div class="content">
 
-    <div class="page-title">
-      <h1>Our Products</h1>
-      <p>Reliable cartridges for every printer</p>
+<header>
+  <a href="/">🏠 Home</a>
+  <a href="/products">🖨️ Products</a>
+</header>
+
+<h1>Our Printer Cartridges</h1>
+
+<div class="search-bar">
+  <input id="searchInput" placeholder="🔍 Search by name or code…">
+</div>
+
+<button class="request-btn" onclick="openGeneralRequest()">
+  💬 Can't Find Your Cartridge? Request It Here
+</button>
+
+<div id="product-container" class="container"></div>
+
+<!-- MODAL -->
+<div id="modal-bg" class="modal-bg">
+  <div class="modal">
+    <h2 id="modalTitle">Request</h2>
+
+    <input id="customerName" placeholder="Your Name">
+    <input id="customerEmail" placeholder="Your Email">
+
+    <select id="printerType">
+      <option value="">Select Printer Brand</option>
+      <option>HP</option>
+      <option>Canon</option>
+      <option>Epson</option>
+      <option>Brother</option>
+      <option>Other</option>
+    </select>
+
+    <div id="quantitySection">
+      <input type="number" id="quantity" min="1" value="1">
     </div>
 
-    <section class="products-grid">
+    <div id="notesSection">
+      <textarea id="notes" rows="3" placeholder="Describe the cartridge you need…"></textarea>
+    </div>
 
-      <div class="product-card">
-        <h3>HP Ink Cartridge</h3>
-        <p>High quality HP compatible cartridge.</p>
-        <button>Request Order</button>
+    <button id="submitOrder">Submit</button>
+  </div>
+</div>
+
+<script>
+let selectedProduct = null;
+
+/* Load products */
+async function loadProducts(query = "") {
+  const res = await fetch(`/api/cartridges?q=${encodeURIComponent(query)}`);
+  const products = await res.json();
+
+  const container = document.getElementById("product-container");
+  container.innerHTML = "";
+
+  products.forEach(p => {
+    const isQuery = !p.price;
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="images/${p.image || "default.jpg"}" onerror="this.src='images/default.jpg'">
+      <h3>${p.name}</h3>
+      ${p.code ? `<small>${p.code}</small>` : ""}
+      <div class="price ${isQuery ? "request" : ""}">
+        ${isQuery ? "Price on Request" : `R${p.price}`}
       </div>
+      <button onclick="openModal(${p.id}, ${isQuery})">
+        ${isQuery ? "💬 Query Price" : "🛒 Order Now"}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
 
-      <div class="product-card">
-        <h3>Canon Ink Cartridge</h3>
-        <p>Sharp prints with long-lasting ink.</p>
-        <button>Request Order</button>
-      </div>
+/* Open modal */
+function openModal(id, isQueryOnly) {
+  selectedProduct = { id, isQueryOnly };
+  modalTitle.innerText = isQueryOnly ? "Query Price" : "Place Order";
+  quantitySection.style.display = isQueryOnly ? "none" : "block";
+  notesSection.style.display = isQueryOnly ? "block" : "none";
+  document.getElementById("modal-bg").style.display = "flex";
+}
 
-      <div class="product-card">
-        <h3>Epson Ink Cartridge</h3>
-        <p>Perfect for everyday printing needs.</p>
-        <button>Request Order</button>
-      </div>
+/* General request */
+function openGeneralRequest() {
+  selectedProduct = null;
+  modalTitle.innerText = "Request a Cartridge";
+  quantitySection.style.display = "none";
+  notesSection.style.display = "block";
+  document.getElementById("modal-bg").style.display = "flex";
+}
 
-      <div class="product-card">
-        <h3>Brother Ink Cartridge</h3>
-        <p>Reliable performance at great value.</p>
-        <button>Request Order</button>
-      </div>
+/* Close modal */
+document.getElementById("modal-bg").onclick = e => {
+  if (e.target.id === "modal-bg") e.target.style.display = "none";
+};
 
-    </section>
+/* Submit */
+submitOrder.onclick = async () => {
+  const name = customerName.value.trim();
+  const email = customerEmail.value.trim();
+  const printerTypeVal = printerType.value;
+  const qty = quantity.value;
+  const notesVal = notes.value.trim();
 
-    <footer>
-      © 2025 Zwiitavhathu Cartridges | Designed by Rotondwa
-    </footer>
+  if (!name || !email) return alert("Please complete required fields.");
 
-  </main>
+  let url, body;
+
+  if (selectedProduct) {
+    url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
+    body = selectedProduct.isQueryOnly
+      ? { name, email, printerType: printerTypeVal, productId: selectedProduct.id, notes: notesVal }
+      : { name, email, printerType: printerTypeVal, productId: selectedProduct.id, quantity: qty };
+  } else {
+    url = "/api/request-cartridge";
+    body = { name, email, printerType: printerTypeVal, requestedItem: notesVal, notes: notesVal };
+  }
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  const result = await res.json();
+  if (result.success) {
+    alert("✅ Request sent successfully!");
+    document.getElementById("modal-bg").style.display = "none";
+  } else {
+    alert("❌ " + (result.error || "Something went wrong"));
+  }
+};
+
+searchInput.oninput = e => loadProducts(e.target.value);
+loadProducts();
+</script>
+
+  </div>
 </div>
 
 </body>
 </html>
+
 
 
 
