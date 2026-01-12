@@ -1,257 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Products – Zwiitavhathu Cartridges</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zwiitavhathu Cartridges – Products</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: #0e1520;
-      color: #fff;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #121212;
+  color: #fff;
+}
 
-    header {
-      padding: 20px;
-      background: linear-gradient(90deg, #00bfff, #00e0ff);
-      text-align: center;
-      font-size: 1.4em;
-      font-weight: bold;
-      color: #001a29;
-    }
+/* Header */
+header {
+  background: #1c1c1c;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 2px solid #00ffc6;
+}
+header a {
+  color: #00ffc6;
+  margin: 0 20px;
+  text-decoration: none;
+  font-weight: 600;
+}
+header a:hover { color: #00cc99; }
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 30px 20px;
-    }
+h1 {
+  text-align: center;
+  margin: 30px 0 15px;
+  font-size: 2.5em;
+  color: #00ffc6;
+}
 
-    .search-box {
-      margin-bottom: 25px;
-      display: flex;
-      gap: 10px;
-    }
+/* Search */
+.search-bar {
+  text-align: center;
+  margin-bottom: 25px;
+}
+.search-bar input {
+  width: 90%;
+  max-width: 480px;
+  padding: 14px 22px;
+  border-radius: 30px;
+  border: none;
+  background: #1f1f1f;
+  color: #fff;
+}
 
-    .search-box input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1em;
-    }
+/* Request Button */
+.request-btn {
+  display: block;
+  margin: 20px auto 40px;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  color: #111;
+  padding: 14px 32px;
+  font-weight: bold;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+}
+.request-btn:hover { transform: scale(1.05); }
 
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
+/* Product Grid */
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 25px;
+  padding: 0 25px 50px;
+}
 
-    .card {
-      background: rgba(255, 255, 255, 0.06);
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-    }
+.card {
+  background: #1f1f1f;
+  border-radius: 18px;
+  text-align: center;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
 
-    .card h3 {
-      color: #00c3ff;
-      margin-bottom: 10px;
-    }
+.card img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+}
 
-    .card p {
-      font-size: 0.95em;
-      color: #d8ecff;
-    }
+.card h3 {
+  color: #00ffc6;
+  font-size: 1.1em;
+}
 
-    .card button {
-      margin-top: 12px;
-      width: 100%;
-      padding: 10px;
-      border-radius: 25px;
-      border: none;
-      background: linear-gradient(90deg, #00bfff, #00e0ff);
-      font-weight: bold;
-      cursor: pointer;
-    }
+.price {
+  font-weight: bold;
+  margin: 10px 0;
+}
+.price.request { color: #ffcc00; }
 
-    .form-section {
-      margin-top: 50px;
-      background: rgba(255,255,255,0.05);
-      padding: 25px;
-      border-radius: 15px;
-    }
+.card button {
+  margin-top: 10px;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    .form-section h2 {
-      color: #00c3ff;
-      margin-bottom: 15px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1em;
-    }
-
-    .form-section button {
-      padding: 12px 30px;
-      border-radius: 30px;
-      border: none;
-      background: linear-gradient(90deg, #00bfff, #00e0ff);
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+/* Modal */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+.modal {
+  background: #1c1c1c;
+  padding: 25px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 360px;
+}
+.modal input, .modal select, .modal textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: none;
+  background: #222;
+  color: #fff;
+}
+.modal button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
 
-<header>🛒 Zwiitavhathu Cartridge Products</header>
+<header>
+  <a href="/">🏠 Home</a>
+  <a href="/products">🖨️ Products</a>
+</header>
 
-<div class="container">
+<h1>Our Printer Cartridges</h1>
 
-  <!-- SEARCH -->
-  <div class="search-box">
-    <input id="search" placeholder="Search by name or code..." />
+<div class="search-bar">
+  <input id="searchInput" placeholder="🔍 Search by name or code…">
+</div>
+
+<button class="request-btn" onclick="openGeneralRequest()">
+  💬 Can't Find Your Cartridge? Request It Here
+</button>
+
+<div id="product-container" class="container"></div>
+
+<!-- Modal -->
+<div id="modal-bg" class="modal-bg">
+  <div class="modal">
+    <h2 id="modalTitle">Request</h2>
+
+    <input id="customerName" placeholder="Your Name">
+    <input id="customerEmail" placeholder="Your Email">
+
+    <select id="printerType">
+      <option value="">Select Printer Brand</option>
+      <option>HP</option>
+      <option>Canon</option>
+      <option>Epson</option>
+      <option>Brother</option>
+      <option>Other</option>
+    </select>
+
+    <div id="quantitySection">
+      <input type="number" id="quantity" min="1" value="1">
+    </div>
+
+    <div id="notesSection">
+      <textarea id="notes" rows="3" placeholder="Describe the cartridge you need…"></textarea>
+    </div>
+
+    <button id="submitOrder">Submit</button>
   </div>
-
-  <!-- PRODUCTS -->
-  <div id="products" class="product-grid"></div>
-
-  <!-- CAN'T FIND CARTRIDGE -->
-  <div class="form-section">
-    <h2>❓ Can’t find your cartridge?</h2>
-
-    <form id="cartridgeRequestForm">
-      <div class="form-group">
-        <input id="name" placeholder="Your Name" required />
-      </div>
-
-      <div class="form-group">
-        <input id="email" type="email" placeholder="Your Email" required />
-      </div>
-
-      <div class="form-group">
-        <input id="printerType" placeholder="Printer Type (optional)" />
-      </div>
-
-      <div class="form-group">
-        <input id="requestedItem" placeholder="Cartridge you are looking for" required />
-      </div>
-
-      <div class="form-group">
-        <textarea id="notes" placeholder="Additional notes (optional)"></textarea>
-      </div>
-
-      <button type="submit">📨 Send Request</button>
-    </form>
-  </div>
-
 </div>
 
 <script>
-  const productsDiv = document.getElementById("products");
-  const searchInput = document.getElementById("search");
+let selectedProduct = null;
 
-  async function loadProducts(q = "") {
-    const res = await fetch(`/api/cartridges?q=${encodeURIComponent(q)}`);
-    const products = await res.json();
+/* Load products */
+async function loadProducts(query = "") {
+  const res = await fetch(`/api/cartridges?q=${encodeURIComponent(query)}`);
+  const products = await res.json();
 
-    productsDiv.innerHTML = "";
+  const container = document.getElementById("product-container");
+  container.innerHTML = "";
 
-    products.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "card";
+  products.forEach(p => {
+    const isQuery = !p.price;
+    const card = document.createElement("div");
+    card.className = "card";
 
-      card.innerHTML = `
-        <h3>${p.name}</h3>
-        <p>Code: ${p.code || "N/A"}</p>
-        <p>Price: R${p.price.toFixed(2)}</p>
-        <button onclick="orderProduct(${p.id})">Order</button>
-      `;
+    card.innerHTML = `
+      <img src="images/${p.image || "default.jpg"}" onerror="this.src='images/default.jpg'">
+      <h3>${p.name}</h3>
+      ${p.code ? `<small>${p.code}</small>` : ""}
+      <div class="price ${isQuery ? "request" : ""}">
+        ${isQuery ? "Price on Request" : `R${p.price}`}
+      </div>
+      <button onclick="openModal(${p.id}, ${isQuery})">
+        ${isQuery ? "💬 Query Price" : "🛒 Order Now"}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
 
-      productsDiv.appendChild(card);
-    });
-  }
+/* Modal open */
+function openModal(id, isQueryOnly) {
+  selectedProduct = { id, isQueryOnly };
+  modalTitle.innerText = isQueryOnly ? "Query Price" : "Place Order";
+  quantitySection.style.display = isQueryOnly ? "none" : "block";
+  notesSection.style.display = isQueryOnly ? "block" : "none";
+  modal-bg.style.display = "flex";
+}
 
-  async function orderProduct(productId) {
-    const name = prompt("Your Name:");
-    const email = prompt("Your Email:");
-    const phone = prompt("Phone (optional):");
-    const printerType = prompt("Printer Type:");
-    const quantity = parseInt(prompt("Quantity:"), 10);
+/* Can't find cartridge */
+function openGeneralRequest() {
+  selectedProduct = null;
+  modalTitle.innerText = "Request a Cartridge";
+  quantitySection.style.display = "none";
+  notesSection.style.display = "block";
+  modal-bg.style.display = "flex";
+}
 
-    if (!name || !email || !quantity) {
-      alert("❌ Missing required fields");
-      return;
-    }
+/* Close modal */
+document.getElementById("modal-bg").onclick = e => {
+  if (e.target.id === "modal-bg") e.target.style.display = "none";
+};
 
-    const res = await fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        email,
-        phone,
-        printerType,
-        productId,
-        quantity
-      })
-    });
+/* Submit */
+submitOrder.onclick = async () => {
+  const name = customerName.value.trim();
+  const email = customerEmail.value.trim();
+  const printerTypeVal = printerType.value;
+  const qty = quantity.value;
+  const notesVal = notes.value.trim();
 
-    const data = await res.json();
+  if (!name || !email) return alert("Please complete required fields.");
 
-    if (data.success) {
-      alert("✅ Order placed successfully!");
-    } else {
-      alert("❌ Order failed");
-    }
-  }
+  let url, body;
 
-  // Cartridge request
-  document.getElementById("cartridgeRequestForm").addEventListener("submit", async e => {
-    e.preventDefault();
-
-    const payload = {
-      name: name.value.trim(),
-      email: email.value.trim(),
-      printerType: printerType.value.trim(),
-      requestedItem: requestedItem.value.trim(),
-      notes: notes.value.trim()
+  if (selectedProduct) {
+    url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
+    body = selectedProduct.isQueryOnly
+      ? { name, email, printerType: printerTypeVal, productId: selectedProduct.id, notes: notesVal }
+      : { name, email, printerType: printerTypeVal, productId: selectedProduct.id, quantity: qty };
+  } else {
+    url = "/api/request-cartridge";
+    body = {
+      name,
+      email,
+      printerType: printerTypeVal,
+      requestedItem: notesVal,
+      notes: notesVal
     };
+  }
 
-    const res = await fetch("/api/request-cartridge", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert("✅ Request sent successfully");
-      e.target.reset();
-    } else {
-      alert("❌ Failed to send request");
-    }
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
   });
 
-  searchInput.addEventListener("input", e => {
-    loadProducts(e.target.value);
-  });
+  const result = await res.json();
+  if (result.success) {
+    alert("✅ Request sent successfully!");
+    modal-bg.style.display = "none";
+  } else {
+    alert("❌ " + (result.error || "Something went wrong"));
+  }
+};
 
-  loadProducts();
+searchInput.oninput = e => loadProducts(e.target.value);
+loadProducts();
 </script>
 
 </body>
 </html>
+
 
 
