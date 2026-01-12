@@ -1,204 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zwiitavhathu Cartridges – Products</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zwiitavhathu Cartridges – Products</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', 'Segoe UI', sans-serif;
-      background: #1a1a1a;
-      color: white;
-    }
+<style>
+/* === Reset & Body === */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #121212;
+  color: #fff;
+  overflow-x: hidden;
+}
 
-    header {
-      background: #111;
-      padding: 18px;
-      text-align: center;
-      border-bottom: 1px solid #00ffc6;
-    }
+/* === Header === */
+header {
+  background: #1c1c1c;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 2px solid #00ffc6;
+}
+header a {
+  color: #00ffc6;
+  margin: 0 20px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+header a:hover { color: #00cc99; }
 
-    header a {
-      color: #00ffc6;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s ease;
-      font-size: 1.1em;
-    }
+/* === Title === */
+h1 {
+  text-align: center;
+  margin: 30px 0 15px;
+  font-size: 2.5em;
+  color: #00ffc6;
+  text-shadow: 0 0 8px rgba(0,255,198,0.5);
+}
 
-    header a:hover {
-      color: #00cc99;
-    }
+/* === Search === */
+.search-bar {
+  text-align: center;
+  margin-bottom: 25px;
+}
+.search-bar input {
+  width: 90%;
+  max-width: 480px;
+  padding: 14px 22px;
+  border-radius: 30px;
+  border: none;
+  background: #1f1f1f;
+  color: #fff;
+  font-size: 1em;
+  outline: none;
+  transition: all 0.3s;
+}
+.search-bar input:focus {
+  background: #2a2a2a;
+  box-shadow: 0 0 12px #00ffc6;
+}
 
-    h1 {
-      text-align: center;
-      margin-top: 30px;
-      color: #00ffc6;
-      font-size: 2.2em;
-      text-shadow: 0 0 12px rgba(0,255,198,0.7);
-    }
+/* === Request Button === */
+.request-btn {
+  display: block;
+  margin: 20px auto 40px;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  color: #111;
+  padding: 14px 32px;
+  font-weight: bold;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.request-btn:hover {
+  background: linear-gradient(45deg, #00cc99, #00b387);
+  transform: scale(1.05);
+}
 
-    /* Search Bar */
-    .search-bar {
-      text-align: center;
-      margin: 20px auto;
-      width: 100%;
-    }
+/* === Product Grid === */
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 25px;
+  padding: 0 25px 50px;
+}
 
-    .search-bar input {
-      width: 85%;
-      max-width: 500px;
-      padding: 12px 20px;
-      border-radius: 25px;
-      border: none;
-      font-size: 1em;
-      background: #333;
-      color: white;
-      outline: none;
-      transition: all 0.3s ease;
-    }
+/* === Card Container for Flip Effect === */
+.card-wrapper {
+  perspective: 1000px;
+}
 
-    .search-bar input:focus {
-      background: #444;
-      box-shadow: 0 0 10px #00ffc6;
-    }
+/* === Card Style === */
+.card {
+  background: #1f1f1f;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  position: relative;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(30px);
+}
+.card.visible { 
+  opacity: 1; 
+  transform: translateY(0); 
+  transition: transform 0.6s, opacity 0.6s;
+}
+.card:hover {
+  transform: translateY(-8px) rotateY(0deg);
+  box-shadow: 0 12px 24px rgba(0,255,198,0.4);
+}
 
-    /* Request Button */
-    .request-btn {
-      display: block;
-      margin: 15px auto;
-      background: #00ffc6;
-      color: black;
-      padding: 12px 28px;
-      border: none;
-      border-radius: 30px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
+/* === Card Front & Back === */
+.card-front, .card-back {
+  backface-visibility: hidden;
+  border-radius: 18px;
+  padding: 20px;
+  position: relative;
+}
+.card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  color: #fff;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-    .request-btn:hover {
-      background: #00cc99;
-      transform: scale(1.05);
-    }
+/* Flip effect on hover */
+.card-wrapper:hover .card {
+  transform: rotateY(180deg) translateY(-8px);
+}
 
-    /* Product Grid */
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 20px;
-      padding: 25px;
-    }
+/* === Product Image === */
+.card img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  transition: transform 0.3s;
+}
 
-    .card {
-      background: #222;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      transition: 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    }
+/* === Product Info === */
+.card h3 {
+  font-size: 1.1em;
+  color: #00ffc6;
+  margin: 10px 0 5px;
+}
+.card small {
+  color: #bbb;
+  display: block;
+  margin-bottom: 8px;
+}
+.price {
+  font-weight: bold;
+  font-size: 1.05em;
+  margin-bottom: 12px;
+}
+.price.normal { color: #00ffc6; }
+.price.request { color: #ffcc00; }
 
-    .card:hover {
-      transform: translateY(-5px);
-      background: #2a2a2a;
-    }
+/* === Order Button Overlay === */
+.overlay-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.card-wrapper:hover .overlay-btn {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
-    .card img {
-      width: 120px;
-      height: auto;
-      margin-bottom: 12px;
-      background: white;
-      padding: 8px;
-      border-radius: 10px;
-    }
-
-    .card h3 {
-      margin: 5px 0;
-      font-size: 1em;
-      color: #00ffc6;
-    }
-
-    .card small {
-      color: #bbb;
-      display: block;
-      margin-bottom: 5px;
-      font-size: 0.85em;
-    }
-
-    .price.normal { color: #00ffc6; }
-    .price.request { color: #ffcc00; }
-
-    .order-btn {
-      background: #00ffc6;
-      color: black;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
-      transition: 0.3s ease;
-      font-size: 0.9em;
-    }
-
-    .order-btn:hover {
-      background: #00cc99;
-      transform: scale(1.05);
-    }
-
-    /* Modal */
-    .modal-bg {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-    }
-
-    .modal {
-      background: #111;
-      padding: 25px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 340px;
-      color: white;
-      box-shadow: 0 0 20px rgba(0,255,198,0.3);
-    }
-
-    .modal input,
-    .modal select,
-    .modal textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      background: #222;
-      border: none;
-      border-radius: 8px;
-      color: white;
-    }
-
-    .modal button {
-      width: 100%;
-      padding: 12px;
-      background: #00ffc6;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-      color: black;
-    }
-
-    .modal button:hover {
-      background: #00cc99;
-    }
-  </style>
+/* === Modal === */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+.modal {
+  background: #1c1c1c;
+  padding: 25px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 360px;
+  box-shadow: 0 0 20px rgba(0,255,198,0.3);
+  color: #fff;
+}
+.modal input, .modal select, .modal textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: none;
+  background: #222;
+  color: #fff;
+}
+.modal button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.modal button:hover {
+  background: linear-gradient(45deg, #00cc99, #00b387);
+}
+</style>
 </head>
 
 <body>
@@ -260,10 +291,12 @@ async function loadProducts(query = "") {
   const container = document.getElementById("product-container");
   container.innerHTML = "";
 
-  // Only allow items with PRICE or QUERY
   const filtered = products.filter(p => p.price || p.is_query_only);
 
   filtered.forEach(p => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "card-wrapper";
+
     const card = document.createElement("div");
     card.className = "card";
 
@@ -272,21 +305,39 @@ async function loadProducts(query = "") {
     const isQuery = !p.price;
 
     card.innerHTML = `
-      <img src="images/${image}" onerror="this.src='images/default.jpg'">
-      <h3>${p.name}</h3>
-      ${p.code ? `<small>Code: ${p.code}</small>` : ""}
-      <div class="price ${isQuery ? 'request' : 'normal'}">${priceText}</div>
-      <button class="order-btn" onclick="openModal(${p.id}, ${isQuery})">
+      <div class="card-front">
+        <img src="images/${image}" onerror="this.src='images/default.jpg'">
+        <h3>${p.name}</h3>
+        ${p.code ? `<small>Code: ${p.code}</small>` : ""}
+        <div class="price ${isQuery ? 'request' : 'normal'}">${priceText}</div>
+      </div>
+      <div class="card-back">
+        <p>${isQuery ? "Contact us for pricing details." : "Click below to order."}</p>
+      </div>
+      <button class="order-btn overlay-btn" onclick="openModal(${p.id}, ${isQuery})">
         ${isQuery ? "💬 Query Price" : "🛒 Order Now"}
       </button>
     `;
 
-    container.appendChild(card);
+    wrapper.appendChild(card);
+    container.appendChild(wrapper);
   });
 
+  fadeInCards();
   if (!container.innerHTML.trim()) {
     container.innerHTML = "<p>No matching cartridges found.</p>";
   }
+}
+
+/* Fade-in on scroll */
+function fadeInCards() {
+  const cards = document.querySelectorAll(".card");
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add("visible");
+    });
+  }, { threshold: 0.1 });
+  cards.forEach(card => observer.observe(card));
 }
 
 /* Open Modal */
