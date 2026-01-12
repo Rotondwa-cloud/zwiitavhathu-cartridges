@@ -20,6 +20,12 @@ const REQUIRED_ENVS = [
   'GOOGLE_EMAIL'
 ];
 
+REQUIRED_ENVS.forEach(key => {
+  if (!process.env[key]) {
+    console.error(`❌ MISSING ENV: ${key}`);
+  }
+});
+
 console.log("🔎 ENV CHECK:", {
   GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
@@ -82,31 +88,54 @@ oauth2Client.setCredentials({
 });
 
 async function sendMail({ subject, html }) {
-  const { token } = await oauth2Client.getAccessToken();
+  try {
+    console.log("📤 Attempting to send email…");
 
-  if (!token) throw new Error("No access token generated");
+    const { token } = await oauth2Client.getAccessToken();
+    if (!token) throw new Error("No access token generated");
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      type: "OAuth2",
-      user: process.env.GOOGLE_EMAIL,
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-      accessToken: token,
-    },
-  });
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: process.env.GOOGLE_EMAIL,
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+        accessToken: token,
+      },
+    });
 
-  const info = await transporter.sendMail({
-    from: `"Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
-    to: process.env.GOOGLE_EMAIL,
-    subject,
-    html,
-  });
+    const info = await transporter.sendMail({
+      from: `"Zwiitavhathu Cartridges" <${process.env.GOOGLE_EMAIL}>`,
+      to: process.env.GOOGLE_EMAIL,
+      subject,
+      html,
+    });
 
-  console.log("📧 Email sent:", info.messageId);
+    console.log("📧 Email sent successfully:", info.messageId);
+    return info;
+
+  } catch (err) {
+    console.error("❌ Gmail sendMail error:", err.message || err);
+    throw err;
+  }
 }
+
+/* ===============================
+   TEST EMAIL (DEBUG ROUTE)
+================================ */
+app.get('/test-email', async (req, res) => {
+  try {
+    await sendMail({
+      subject: "TEST EMAIL – Zwiitavhathu",
+      html: "<h1>If you see this, Gmail API works 🎉</h1>"
+    });
+    res.send("✅ Test email sent");
+  } catch (err) {
+    res.status(500).send("❌ Test email failed");
+  }
+});
 
 /* ===============================
    IMPORT WORD DOCUMENT
@@ -143,15 +172,7 @@ app.get('/api/import-cartridges', async (req, res) => {
 
       if (!name || name.length < 3) continue;
 
-      insert.run(
-        name,
-        name,
-        price,
-        "default.jpg",
-        code,
-        price ? 0 : 1
-      );
-
+      insert.run(name, name, price, "default.jpg", code, price ? 0 : 1);
       count++;
     }
 
@@ -197,11 +218,7 @@ app.post('/api/order', (req, res) => {
       "SELECT * FROM cartridges WHERE id=?"
     ).get(productId);
 
-    if (!product) {
-      return res.status(400).json({ error: "Invalid product" });
-    }
-
-    if (product.is_query_only || product.price === null) {
+    if (!product || product.is_query_only || product.price === null) {
       return res.status(400).json({ error: "Price query required" });
     }
 
@@ -225,6 +242,8 @@ app.post('/api/order', (req, res) => {
    PRICE QUERY (EMAIL)
 ================================ */
 app.post('/api/query', async (req, res) => {
+  console.log("📩 /api/query HIT:", req.body);
+
   try {
     const { name, email, printerType, productId, notes } = req.body;
 
@@ -269,4 +288,5 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
