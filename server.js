@@ -54,9 +54,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// ✅ ABOUT PAGE (⬅️ THIS IS THE FIX)
+// ✅ ABOUT PAGE
 app.get('/about', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/about.html'));
+});
+
+// ✅ PRODUCTS PAGE
+app.get('/products', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/products.html'));
 });
 
 /* ===============================
@@ -85,4 +90,5 @@ app.get('/test-email', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
