@@ -5,175 +5,155 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Zwiitavhathu Cartridges – Products</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
+
 /* ================= GLOBAL ================= */
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: #121212;
-  color: #fff;
-}
-
-/* ================= LAYOUT ================= */
-.page {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* ================= SIDEBAR ================= */
-.sidebar {
-  width: 220px;
-  background: #0f1c2d;
-  padding: 25px 20px;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.5);
-}
-
-.sidebar h2 {
-  color: #00ffc6;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.sidebar a {
-  display: block;
-  color: #cfe8ff;
-  text-decoration: none;
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-.sidebar a:hover,
-.sidebar a.active {
-  background: linear-gradient(45deg, #00ffc6, #00cc99);
-  color: #111;
-}
-
-/* ================= MOBILE TOGGLE ================= */
-.mobile-toggle {
-  display: none;
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  font-size: 1.8em;
-  color: #00ffc6;
-  z-index: 999;
-  cursor: pointer;
-}
-
-/* ================= CONTENT ================= */
-.content {
-  flex: 1;
+  background: #f5f6f8;
+  color: #222;
 }
 
 /* ================= HEADER ================= */
 header {
-  background: #1c1c1c;
-  padding: 20px;
-  text-align: center;
-  border-bottom: 2px solid #00ffc6;
+  background: #111827;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
 }
 
-header a {
-  color: #00ffc6;
-  margin: 0 20px;
+header h2 {
+  margin: 0;
+}
+
+header nav a {
+  color: #ccc;
+  margin-left: 20px;
   text-decoration: none;
   font-weight: 600;
 }
 
-header a:hover {
-  color: #00cc99;
+header nav a:hover {
+  color: #fff;
 }
 
-/* ================= TITLE ================= */
-h1 {
-  text-align: center;
-  margin: 30px 0 15px;
-  font-size: 2.5em;
-  color: #00ffc6;
+/* ================= LAYOUT ================= */
+.shop-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ================= FILTERS ================= */
+.filters {
+  width: 260px;
+  background: white;
+  padding: 25px;
+  border-right: 1px solid #e4e4e4;
+}
+
+.filters h3 {
+  font-size: 15px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.filters label {
+  display: block;
+  font-size: 14px;
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+/* ================= CONTENT ================= */
+.shop-content {
+  flex: 1;
+  padding: 30px 40px;
+}
+
+.shop-content h1 {
+  margin-top: 0;
 }
 
 /* ================= SEARCH ================= */
 .search-bar {
-  text-align: center;
-  margin-bottom: 25px;
+  margin: 20px 0 30px;
 }
 
 .search-bar input {
-  width: 90%;
-  max-width: 480px;
-  padding: 14px 22px;
-  border-radius: 30px;
-  border: none;
-  background: #1f1f1f;
-  color: #fff;
+  width: 100%;
+  max-width: 450px;
+  padding: 12px 18px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
 }
 
-/* ================= REQUEST BUTTON ================= */
-.request-btn {
-  display: block;
-  margin: 20px auto 40px;
-  background: linear-gradient(45deg, #00ffc6, #00cc99);
-  color: #111;
-  padding: 14px 32px;
-  font-weight: bold;
-  border-radius: 30px;
-  border: none;
-  cursor: pointer;
-}
-
-.request-btn:hover {
-  transform: scale(1.05);
-}
-
-/* ================= PRODUCTS ================= */
-.container {
+/* ================= GRID ================= */
+.product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 25px;
-  padding: 0 25px 50px;
 }
 
+/* ================= CARD ================= */
 .card {
-  background: #1f1f1f;
-  border-radius: 18px;
-  text-align: center;
+  background: #fff;
+  border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  border: 1px solid #e4e4e4;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .card img {
-  width: 130px;
-  height: 130px;
+  height: 180px;
   object-fit: contain;
-  background: #fff;
-  padding: 10px;
-  border-radius: 12px;
+  margin-bottom: 15px;
 }
 
 .card h3 {
-  color: #00ffc6;
-  font-size: 1.1em;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.card small {
+  color: #777;
 }
 
 .price {
+  font-size: 18px;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 12px 0;
 }
 
 .price.request {
-  color: #ffcc00;
+  color: #ff8800;
 }
 
 .card button {
-  margin-top: 10px;
-  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  margin-top: auto;
+  background: #0a66ff;
+  color: white;
   border: none;
-  padding: 10px 18px;
-  border-radius: 20px;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
+}
+
+.card button:hover {
+  background: #004bd1;
 }
 
 /* ================= MODAL ================= */
@@ -181,18 +161,18 @@ h1 {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.7);
   justify-content: center;
   align-items: center;
-  z-index: 50;
+  z-index: 100;
 }
 
 .modal {
-  background: #1c1c1c;
+  background: white;
   padding: 25px;
-  border-radius: 16px;
+  border-radius: 12px;
   width: 90%;
-  max-width: 360px;
+  max-width: 380px;
 }
 
 .modal input,
@@ -201,80 +181,77 @@ h1 {
   width: 100%;
   padding: 12px;
   margin-bottom: 15px;
-  border-radius: 10px;
-  border: none;
-  background: #222;
-  color: #fff;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 .modal button {
   width: 100%;
-  padding: 14px;
-  border-radius: 14px;
+  padding: 12px;
+  border-radius: 6px;
   border: none;
-  background: linear-gradient(45deg, #00ffc6, #00cc99);
+  background: #0a66ff;
+  color: white;
   font-weight: bold;
+  cursor: pointer;
 }
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 900px) {
-  .sidebar {
-    position: fixed;
-    left: -240px;
-    top: 0;
-    height: 100%;
-    transition: 0.3s;
-    z-index: 998;
-  }
-
-  .sidebar.open {
-    left: 0;
-  }
-
-  .mobile-toggle {
-    display: block;
-  }
-
-  .page {
+  .shop-page {
     flex-direction: column;
   }
+
+  .filters {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
 }
+
 </style>
 </head>
 
 <body>
 
-<span class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</span>
-
-<div class="page">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2>🖨️ Zwiitavhathu</h2>
-    <a href="/" >🏠 Home</a>
-    <a href="/products" class="active">🖨️ Products</a>
-    <a href="/about">ℹ️ About</a>
-  </aside>
-
-  <!-- CONTENT -->
-  <div class="content">
-
 <header>
-  <a href="/">🏠 Home</a>
-  <a href="/products">🖨️ Products</a>
+  <h2>🖨️ Zwiitavhathu Cartridges</h2>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/products">Products</a>
+    <a href="/about">About</a>
+  </nav>
 </header>
 
-<h1>Our Printer Cartridges</h1>
+<div class="shop-page">
 
-<div class="search-bar">
-  <input id="searchInput" placeholder="🔍 Search by name or code…">
+  <!-- FILTERS -->
+  <aside class="filters">
+    <h3>Availability</h3>
+    <label><input type="checkbox"> In Stock</label>
+    <label><input type="checkbox"> Out of Stock</label>
+
+    <h3>Brand</h3>
+    <label><input type="checkbox"> HP</label>
+    <label><input type="checkbox"> Canon</label>
+    <label><input type="checkbox"> Epson</label>
+    <label><input type="checkbox"> Brother</label>
+  </aside>
+
+  <!-- PRODUCTS -->
+  <div class="shop-content">
+
+    <h1>Our Printer Cartridges</h1>
+
+    <div class="search-bar">
+      <input id="searchInput" placeholder="Search by name or code...">
+    </div>
+
+    <div id="product-container" class="product-grid"></div>
+
+  </div>
+
 </div>
-
-<button class="request-btn" onclick="openGeneralRequest()">
-  💬 Can't Find Your Cartridge? Request It Here
-</button>
-
-<div id="product-container" class="container"></div>
 
 <!-- MODAL -->
 <div id="modal-bg" class="modal-bg">
@@ -309,7 +286,6 @@ h1 {
 <script>
 let selectedProduct = null;
 
-/* Load products */
 async function loadProducts(query = "") {
   const res = await fetch(`/api/cartridges?q=${encodeURIComponent(query)}`);
   const products = await res.json();
@@ -330,14 +306,14 @@ async function loadProducts(query = "") {
         ${isQuery ? "Price on Request" : `R${p.price}`}
       </div>
       <button onclick="openModal(${p.id}, ${isQuery})">
-        ${isQuery ? "💬 Query Price" : "🛒 Order Now"}
+        ${isQuery ? "Query Price" : "Order Now"}
       </button>
     `;
+
     container.appendChild(card);
   });
 }
 
-/* Open modal */
 function openModal(id, isQueryOnly) {
   selectedProduct = { id, isQueryOnly };
   modalTitle.innerText = isQueryOnly ? "Query Price" : "Place Order";
@@ -346,7 +322,6 @@ function openModal(id, isQueryOnly) {
   document.getElementById("modal-bg").style.display = "flex";
 }
 
-/* General request */
 function openGeneralRequest() {
   selectedProduct = null;
   modalTitle.innerText = "Request a Cartridge";
@@ -355,12 +330,10 @@ function openGeneralRequest() {
   document.getElementById("modal-bg").style.display = "flex";
 }
 
-/* Close modal */
 document.getElementById("modal-bg").onclick = e => {
   if (e.target.id === "modal-bg") e.target.style.display = "none";
 };
 
-/* Submit */
 submitOrder.onclick = async () => {
   const name = customerName.value.trim();
   const email = customerEmail.value.trim();
@@ -391,9 +364,8 @@ submitOrder.onclick = async () => {
 
   const result = await res.json();
   if (result.success) {
-    alert("✅ Request sent successfully!");
+    alert("Request sent successfully!");
     document.getElementById("modal-bg").style.display = "none";
-    // clear fields
     customerName.value = "";
     customerEmail.value = "";
     customerPhone.value = "";
@@ -401,7 +373,7 @@ submitOrder.onclick = async () => {
     quantity.value = 1;
     notes.value = "";
   } else {
-    alert("❌ " + (result.error || "Something went wrong"));
+    alert(result.error || "Something went wrong");
   }
 };
 
@@ -409,11 +381,9 @@ searchInput.oninput = e => loadProducts(e.target.value);
 loadProducts();
 </script>
 
-  </div>
-</div>
-
 </body>
 </html>
+
 
 
 
