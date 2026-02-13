@@ -27,10 +27,6 @@ header {
   color: white;
 }
 
-header h2 {
-  margin: 0;
-}
-
 header nav a {
   color: #ccc;
   margin-left: 20px;
@@ -56,32 +52,15 @@ header nav a:hover {
   border-right: 1px solid #e4e4e4;
 }
 
-.filters h3 {
-  font-size: 15px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-.filters label {
-  display: block;
-  font-size: 14px;
-  margin: 8px 0;
-  cursor: pointer;
-}
-
 /* ================= CONTENT ================= */
 .shop-content {
   flex: 1;
   padding: 30px 40px;
 }
 
-.shop-content h1 {
-  margin-top: 0;
-}
-
 /* ================= SEARCH ================= */
 .search-bar {
-  margin: 20px 0 30px;
+  margin: 20px 0 20px;
 }
 
 .search-bar input {
@@ -90,7 +69,22 @@ header nav a:hover {
   padding: 12px 18px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 14px;
+}
+
+/* ================= REQUEST BUTTON ================= */
+.request-missing-btn {
+  margin-bottom: 25px;
+  background: #ff8800;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.request-missing-btn:hover {
+  background: #e67600;
 }
 
 /* ================= GRID ================= */
@@ -172,7 +166,11 @@ header nav a:hover {
   padding: 25px;
   border-radius: 12px;
   width: 90%;
-  max-width: 380px;
+  max-width: 400px;
+}
+
+.modal h2 {
+  margin-top: 0;
 }
 
 .modal input,
@@ -194,6 +192,10 @@ header nav a:hover {
   color: white;
   font-weight: bold;
   cursor: pointer;
+}
+
+.modal button:hover {
+  background: #004bd1;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -247,6 +249,11 @@ header nav a:hover {
       <input id="searchInput" placeholder="Search by name or code...">
     </div>
 
+    <!-- NEW BUTTON -->
+    <button class="request-missing-btn" onclick="openMissingModal()">
+      Can't Find Your Cartridge? Click Here
+    </button>
+
     <div id="product-container" class="product-grid"></div>
 
   </div>
@@ -258,10 +265,10 @@ header nav a:hover {
   <div class="modal">
     <h2 id="modalTitle">Request</h2>
 
-    <input id="customerName" placeholder="Your Name">
-    <input id="customerEmail" placeholder="Your Email">
+    <input id="customerName" placeholder="Your Name *">
+    <input id="customerEmail" placeholder="Your Email *">
     <input id="customerPhone" placeholder="Your Phone Number">
-
+    
     <select id="printerType">
       <option value="">Select Printer Brand</option>
       <option>HP</option>
@@ -285,7 +292,9 @@ header nav a:hover {
 
 <script>
 let selectedProduct = null;
+let isMissingRequest = false;
 
+/* Load products */
 async function loadProducts(query = "") {
   const res = await fetch(`/api/cartridges?q=${encodeURIComponent(query)}`);
   const products = await res.json();
@@ -314,26 +323,36 @@ async function loadProducts(query = "") {
   });
 }
 
+/* Product modal */
 function openModal(id, isQueryOnly) {
   selectedProduct = { id, isQueryOnly };
+  isMissingRequest = false;
+
   modalTitle.innerText = isQueryOnly ? "Query Price" : "Place Order";
   quantitySection.style.display = isQueryOnly ? "none" : "block";
   notesSection.style.display = isQueryOnly ? "block" : "none";
+
   document.getElementById("modal-bg").style.display = "flex";
 }
 
-function openGeneralRequest() {
+/* Missing cartridge modal */
+function openMissingModal() {
   selectedProduct = null;
+  isMissingRequest = true;
+
   modalTitle.innerText = "Request a Cartridge";
   quantitySection.style.display = "none";
   notesSection.style.display = "block";
+
   document.getElementById("modal-bg").style.display = "flex";
 }
 
+/* Close modal */
 document.getElementById("modal-bg").onclick = e => {
   if (e.target.id === "modal-bg") e.target.style.display = "none";
 };
 
+/* Submit */
 submitOrder.onclick = async () => {
   const name = customerName.value.trim();
   const email = customerEmail.value.trim();
@@ -346,14 +365,15 @@ submitOrder.onclick = async () => {
 
   let url, body;
 
-  if (selectedProduct) {
+  if (isMissingRequest) {
+    url = "/api/request-cartridge";
+    body = { name, email, phone: phoneVal, printerType: printerTypeVal, requestedItem: notesVal, notes: notesVal };
+  }
+  else if (selectedProduct) {
     url = selectedProduct.isQueryOnly ? "/api/query" : "/api/order";
     body = selectedProduct.isQueryOnly
       ? { name, email, printerType: printerTypeVal, productId: selectedProduct.id, notes: notesVal }
       : { name, email, phone: phoneVal, printerType: printerTypeVal, productId: selectedProduct.id, quantity: qty };
-  } else {
-    url = "/api/request-cartridge";
-    body = { name, email, printerType: printerTypeVal, requestedItem: notesVal, notes: notesVal };
   }
 
   const res = await fetch(url, {
@@ -363,6 +383,7 @@ submitOrder.onclick = async () => {
   });
 
   const result = await res.json();
+
   if (result.success) {
     alert("Request sent successfully!");
     document.getElementById("modal-bg").style.display = "none";
@@ -383,6 +404,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
