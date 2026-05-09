@@ -71,14 +71,20 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 `);
 
-// Ensure customer_phone column exists (for existing databases)
-try {
-  db.prepare("ALTER TABLE orders ADD COLUMN customer_phone TEXT").run();
-} catch (err) {
-  if (!err.message.includes("duplicate column name")) {
-    console.error("❌ Failed to add customer_phone column:", err);
-  }
-}
+// Stock movement log table (NEW)
+db.exec(`
+CREATE TABLE IF NOT EXISTS stock_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_id INTEGER,
+  product_name TEXT,
+  movement_type TEXT,
+  quantity INTEGER,
+  new_quantity INTEGER,
+  note TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES cartridges(id)
+);
+`);
 
 // Cartridge requests table
 db.exec(`
@@ -92,6 +98,19 @@ CREATE TABLE IF NOT EXISTS cartridge_requests (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 `);
+
+// Safe column additions for existing databases
+const safeAlter = (sql) => {
+  try { db.prepare(sql).run(); } catch (err) {
+    if (!err.message.includes("duplicate column name")) {
+      console.error("❌ ALTER TABLE error:", err.message);
+    }
+  }
+};
+
+safeAlter("ALTER TABLE orders ADD COLUMN customer_phone TEXT");
+safeAlter("ALTER TABLE cartridges ADD COLUMN stock INTEGER DEFAULT 0");
+safeAlter("ALTER TABLE cartridges ADD COLUMN brand TEXT");
 
 console.log("✅ SQLite ready");
 
@@ -108,12 +127,10 @@ oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
-// Encode UTF-8 subject
 function encodeUTF8Base64(str) {
   return `=?UTF-8?B?${Buffer.from(str, 'utf-8').toString('base64')}?=`;
 }
 
-// Send email
 async function sendMail({ subject, html, to }) {
   try {
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
@@ -201,17 +218,135 @@ app.get('/api/cartridges', (req, res) => {
   try {
     const q = `%${(req.query.q || "").trim()}%`;
     const rows = db.prepare(`
-      SELECT *
+      SELECT id, name, description, price, image, code, is_query_only, stock, brand
       FROM cartridges
-      WHERE price IS NOT NULL
-        AND is_query_only = 0
-        AND (name LIKE ? OR code LIKE ?)
+      WHERE (name LIKE ? OR code LIKE ?)
       ORDER BY name
     `).all(q, q);
     res.json(rows);
   } catch (err) {
     console.error("❌ Fetch products error:", err);
     res.status(500).json({ error: "DB error" });
+  }
+});
+
+/* ===============================
+   ADD PRODUCT (NEW)
+================================ */
+app.post('/api/cartridges', (req, res) => {
+  try {
+    const { name, code, brand, price, stock, image } = req.body;
+    if (!name) return res.status(400).json({ error: "Product name is required" });
+
+    const result = db.prepare(`
+      INSERT INTO cartridges (name, description, price, image, code, brand, stock, is_query_only)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      name,
+      name,
+      price || null,
+      image || 'default.jpg',
+      code || null,
+      brand || null,
+      stock || 0,
+      price ? 0 : 1
+    );
+
+    res.json({ success: true, id: result.lastInsertRowid });
+  } catch (err) {
+    console.error("❌ Add product error:", err);
+    res.status(500).json({ error: "Failed to add product" });
+  }
+});
+
+/* ===============================
+   EDIT PRODUCT (NEW)
+================================ */
+app.put('/api/cartridges/:id', (req, res) => {
+  try {
+    const { name, code, brand, price, stock, image } = req.body;
+    const { id } = req.params;
+    if (!name) return res.status(400).json({ error: "Product name is required" });
+
+    db.prepare(`
+      UPDATE cartridges
+      SET name=?, description=?, code=?, brand=?, price=?, stock=?, image=?, is_query_only=?
+      WHERE id=?
+    `).run(
+      name,
+      name,
+      code || null,
+      brand || null,
+      price || null,
+      stock ?? 0,
+      image || 'default.jpg',
+      price ? 0 : 1,
+      id
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Edit product error:", err);
+    res.status(500).json({ error: "Failed to update product" });
+  }
+});
+
+/* ===============================
+   UPDATE STOCK ONLY (NEW)
+================================ */
+app.patch('/api/cartridges/:id/stock', (req, res) => {
+  try {
+    const { stock, movement_type, quantity, note } = req.body;
+    const { id } = req.params;
+
+    if (stock === undefined) return res.status(400).json({ error: "stock value is required" });
+
+    // Update stock on the product
+    db.prepare(`UPDATE cartridges SET stock=? WHERE id=?`).run(stock, id);
+
+    // Write to stock log if movement details provided
+    if (movement_type && quantity) {
+      const product = db.prepare("SELECT name FROM cartridges WHERE id=?").get(id);
+      db.prepare(`
+        INSERT INTO stock_log (product_id, product_name, movement_type, quantity, new_quantity, note)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(id, product?.name || '', movement_type, quantity, stock, note || '');
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Stock update error:", err);
+    res.status(500).json({ error: "Failed to update stock" });
+  }
+});
+
+/* ===============================
+   DELETE PRODUCT (NEW)
+================================ */
+app.delete('/api/cartridges/:id', (req, res) => {
+  try {
+    db.prepare(`DELETE FROM cartridges WHERE id=?`).run(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Delete product error:", err);
+    res.status(500).json({ error: "Failed to delete product" });
+  }
+});
+
+/* ===============================
+   GET STOCK LOG (NEW)
+================================ */
+app.get('/api/stock-log', (req, res) => {
+  try {
+    const rows = db.prepare(`
+      SELECT * FROM stock_log
+      ORDER BY created_at DESC
+      LIMIT 500
+    `).all();
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Stock log error:", err);
+    res.status(500).json({ error: "Failed to fetch stock log" });
   }
 });
 
@@ -228,11 +363,19 @@ app.post('/api/order', async (req, res) => {
 
     const total = product.price * quantity;
 
-    const result = db.prepare(`
+    db.prepare(`
       INSERT INTO orders
       (customer_name, customer_email, customer_phone, printer_type, product_id, quantity, total)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(name, email, phone || '', printerType, productId, quantity, total);
+
+    // Reduce stock automatically when an order is placed
+    const newStock = Math.max(0, (product.stock ?? 0) - quantity);
+    db.prepare(`UPDATE cartridges SET stock=? WHERE id=?`).run(newStock, productId);
+    db.prepare(`
+      INSERT INTO stock_log (product_id, product_name, movement_type, quantity, new_quantity, note)
+      VALUES (?, ?, 'out', ?, ?, 'Customer order')
+    `).run(productId, product.name, quantity, newStock);
 
     // Customer email
     await sendMail({
@@ -261,10 +404,11 @@ app.post('/api/order', async (req, res) => {
         <p><strong>Product:</strong> ${product.name}</p>
         <p><strong>Quantity:</strong> ${quantity}</p>
         <p><strong>Total:</strong> R${total.toFixed(2)}</p>
+        <p><strong>Remaining Stock:</strong> ${newStock}</p>
       `
     });
 
-    res.json({ success: true, orderId: result.lastInsertRowid });
+    res.json({ success: true });
 
   } catch (err) {
     console.error("❌ Order error:", err);
@@ -309,14 +453,12 @@ app.post('/api/request-cartridge', async (req, res) => {
     if (!name || !email || !requestedItem)
       return res.status(400).json({ error: "Name, email, and requested item are required" });
 
-    // Save in DB
     db.prepare(`
       INSERT INTO cartridge_requests
       (customer_name, customer_email, printer_type, requested_item, notes)
       VALUES (?, ?, ?, ?, ?)
     `).run(name, email, printerType || '', requestedItem, notes || '');
 
-    // Admin email
     await sendMail({
       subject: `Cartridge Request – ${requestedItem}`,
       html: `
@@ -329,7 +471,6 @@ app.post('/api/request-cartridge', async (req, res) => {
       `
     });
 
-    // Customer confirmation
     await sendMail({
       subject: `We received your cartridge request – ${requestedItem}`,
       to: email,
@@ -351,10 +492,17 @@ app.post('/api/request-cartridge', async (req, res) => {
 });
 
 /* ===============================
+   ADMIN PAGE
+================================ */
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+/* ===============================
    ROOT
 ================================ */
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 /* ===============================
