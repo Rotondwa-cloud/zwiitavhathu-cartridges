@@ -1,4 +1,5 @@
 const express = require('express');
+const basicAuth = require('express-basic-auth');
 const Database = require('better-sqlite3');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -16,7 +17,9 @@ const REQUIRED_ENVS = [
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
   'GOOGLE_REFRESH_TOKEN',
-  'GOOGLE_EMAIL'
+  'GOOGLE_EMAIL',
+  'ADMIN_USER',
+  'ADMIN_PASS'
 ];
 
 REQUIRED_ENVS.forEach(key => {
@@ -30,6 +33,8 @@ console.log("🔎 ENV CHECK:", {
   GOOGLE_CLIENT_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
   GOOGLE_REFRESH_TOKEN: !!process.env.GOOGLE_REFRESH_TOKEN,
   GOOGLE_EMAIL: !!process.env.GOOGLE_EMAIL,
+  ADMIN_USER: !!process.env.ADMIN_USER,
+  ADMIN_PASS: !!process.env.ADMIN_PASS,
 });
 
 /* ===============================
@@ -71,7 +76,7 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 `);
 
-// Stock movement log table (NEW)
+// Stock movement log table
 db.exec(`
 CREATE TABLE IF NOT EXISTS stock_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -189,8 +194,8 @@ app.get('/api/import-cartridges', async (req, res) => {
 
     db.exec("DELETE FROM cartridges");
     const insert = db.prepare(`
-      INSERT INTO cartridges (name, description, price, image, code, is_query_only)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO cartridges (name, description, price, image, code, is_query_only, stock)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
 
     let count = 0;
@@ -201,7 +206,8 @@ app.get('/api/import-cartridges', async (req, res) => {
       const code = codeMatch ? codeMatch[1] : null;
       const name = line.replace(priceRegex, '').replace(codeRegex, '').trim();
       if (!name || name.length < 3) continue;
-      insert.run(name, name, price, "default.jpg", code, price ? 0 : 1);
+      // Default stock = 10 so products show as In Stock after import
+      insert.run(name, name, price, "default.jpg", code, price ? 0 : 1, 10);
       count++;
     }
     res.json({ success: true, imported: count });
@@ -212,7 +218,8 @@ app.get('/api/import-cartridges', async (req, res) => {
 });
 
 /* ===============================
-   GET PRODUCTS
+   GET PRODUCTS — public shop page
+   Only shows products with a name and price
 ================================ */
 app.get('/api/cartridges', (req, res) => {
   try {
@@ -220,7 +227,11 @@ app.get('/api/cartridges', (req, res) => {
     const rows = db.prepare(`
       SELECT id, name, description, price, image, code, is_query_only, stock, brand
       FROM cartridges
-      WHERE (name LIKE ? OR code LIKE ?)
+      WHERE
+        name IS NOT NULL
+        AND trim(name) != ''
+        AND (price IS NOT NULL OR is_query_only = 1)
+        AND (name LIKE ? OR code LIKE ?)
       ORDER BY name
     `).all(q, q);
     res.json(rows);
@@ -231,7 +242,27 @@ app.get('/api/cartridges', (req, res) => {
 });
 
 /* ===============================
-   ADD PRODUCT (NEW)
+   GET ALL PRODUCTS — admin only
+   No filters, shows everything
+================================ */
+app.get('/api/admin/cartridges', (req, res) => {
+  try {
+    const q = `%${(req.query.q || "").trim()}%`;
+    const rows = db.prepare(`
+      SELECT id, name, description, price, image, code, is_query_only, stock, brand
+      FROM cartridges
+      WHERE name LIKE ? OR code LIKE ?
+      ORDER BY name
+    `).all(q, q);
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Fetch admin products error:", err);
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+/* ===============================
+   ADD PRODUCT
 ================================ */
 app.post('/api/cartridges', (req, res) => {
   try {
@@ -248,7 +279,7 @@ app.post('/api/cartridges', (req, res) => {
       image || 'default.jpg',
       code || null,
       brand || null,
-      stock || 0,
+      stock ?? 0,
       price ? 0 : 1
     );
 
@@ -260,7 +291,7 @@ app.post('/api/cartridges', (req, res) => {
 });
 
 /* ===============================
-   EDIT PRODUCT (NEW)
+   EDIT PRODUCT
 ================================ */
 app.put('/api/cartridges/:id', (req, res) => {
   try {
@@ -292,7 +323,7 @@ app.put('/api/cartridges/:id', (req, res) => {
 });
 
 /* ===============================
-   UPDATE STOCK ONLY (NEW)
+   UPDATE STOCK ONLY
 ================================ */
 app.patch('/api/cartridges/:id/stock', (req, res) => {
   try {
@@ -301,10 +332,8 @@ app.patch('/api/cartridges/:id/stock', (req, res) => {
 
     if (stock === undefined) return res.status(400).json({ error: "stock value is required" });
 
-    // Update stock on the product
     db.prepare(`UPDATE cartridges SET stock=? WHERE id=?`).run(stock, id);
 
-    // Write to stock log if movement details provided
     if (movement_type && quantity) {
       const product = db.prepare("SELECT name FROM cartridges WHERE id=?").get(id);
       db.prepare(`
@@ -321,7 +350,7 @@ app.patch('/api/cartridges/:id/stock', (req, res) => {
 });
 
 /* ===============================
-   DELETE PRODUCT (NEW)
+   DELETE PRODUCT
 ================================ */
 app.delete('/api/cartridges/:id', (req, res) => {
   try {
@@ -334,7 +363,7 @@ app.delete('/api/cartridges/:id', (req, res) => {
 });
 
 /* ===============================
-   GET STOCK LOG (NEW)
+   GET STOCK LOG
 ================================ */
 app.get('/api/stock-log', (req, res) => {
   try {
@@ -369,7 +398,7 @@ app.post('/api/order', async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(name, email, phone || '', printerType, productId, quantity, total);
 
-    // Reduce stock automatically when an order is placed
+    // Reduce stock automatically when order placed
     const newStock = Math.max(0, (product.stock ?? 0) - quantity);
     db.prepare(`UPDATE cartridges SET stock=? WHERE id=?`).run(newStock, productId);
     db.prepare(`
@@ -492,8 +521,15 @@ app.post('/api/request-cartridge', async (req, res) => {
 });
 
 /* ===============================
-   ADMIN PAGE
+   ADMIN — password protected
+   Credentials stored in Render env vars:
+   ADMIN_USER and ADMIN_PASS
 ================================ */
+app.use('/admin', basicAuth({
+  users: { [process.env.ADMIN_USER]: process.env.ADMIN_PASS },
+  challenge: true
+}));
+
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
