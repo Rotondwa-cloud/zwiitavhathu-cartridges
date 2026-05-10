@@ -206,7 +206,6 @@ app.get('/api/import-cartridges', async (req, res) => {
       const code = codeMatch ? codeMatch[1] : null;
       const name = line.replace(priceRegex, '').replace(codeRegex, '').trim();
       if (!name || name.length < 3) continue;
-      // Default stock = 10 so products show as In Stock after import
       insert.run(name, name, price, "default.jpg", code, price ? 0 : 1, 10);
       count++;
     }
@@ -535,10 +534,18 @@ app.get('/admin', (req, res) => {
 });
 
 /* ===============================
-   ROOT
+   PAGE ROUTES
 ================================ */
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/products', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'products.html'));
+});
+
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'about.html'));
 });
 
 /* ===============================
